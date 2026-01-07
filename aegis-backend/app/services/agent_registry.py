@@ -5,7 +5,7 @@ import random
 class AgentRegistry:
     """
     Simulates a decentralized identity registry (DID) running on Azure Cosmos DB.
-    Acts as the 'Source of Truth' for the Trust Protocol.
+    Now includes 'Cognitive Support' (Memory) and 'Sponsorship' tracking.
     """
     
     # --- THE GREEN LIST (Trusted Identities) ---
@@ -21,7 +21,14 @@ class AgentRegistry:
             "accreditation": "FDIC Insured Contact Center",
             "c2pa_profile": "Standard_Banking_v1",
             "reputation_score": 99.9,
-            "verification_proof": "Entra_Verifiable_Credential_v2"
+            "verification_proof": "Entra_Verifiable_Credential_v2",
+            "sponsor": "Bank of America Corp (LEI: 5493005F...", # FEATURE: Agent Sponsorship
+            "graph_context": {
+                "relationship": "Assigned Case Worker",
+                "case_id": "CAS-29381-X9Y2",
+                "last_interaction": "2 days ago",
+                "memory_recall": "Last discussed: Mortgage Refinance Rate" # FEATURE: Cognitive Support
+            }
         },
         "microsoft-support-id": {
             "name": "Microsoft Azure Support",
@@ -32,7 +39,14 @@ class AgentRegistry:
             "accreditation": "Official Partner",
             "c2pa_profile": "MS_Enterprise_v2",
             "reputation_score": 100.0,
-            "verification_proof": "Entra_Verifiable_Credential_v2"
+            "verification_proof": "Entra_Verifiable_Credential_v2",
+            "sponsor": "Microsoft Corporation",
+            "graph_context": {
+                "relationship": "Enterprise Support Plan",
+                "case_id": "SR-99281-AZ",
+                "last_interaction": "1 hour ago",
+                "memory_recall": "Last discussed: VM Quota Increase"
+            }
         }
     }
 
@@ -45,14 +59,18 @@ class AgentRegistry:
             "reported_count": 1420,
             "last_seen_location": "Unknown Proxy",
             "associated_botnet": "DarkNexus-v4",
-            "verification_proof": "MISSING_SIGNATURE"
+            "verification_proof": "MISSING_SIGNATURE",
+            "sponsor": "UNKNOWN / ANONYMOUS",
+            "graph_context": None
         },
         "bot-net-id": {
             "name": "Automated Dialer",
             "risk_level": "HIGH",
             "threat_vector": "Spam / Phishing",
             "reported_count": 50000,
-            "verification_proof": "REVOKED_CERTIFICATE"
+            "verification_proof": "REVOKED_CERTIFICATE",
+            "sponsor": "Shell Company LLC",
+            "graph_context": None
         }
     }
 
@@ -62,7 +80,6 @@ class AgentRegistry:
         Phase 1: Identity Resolution.
         Queries the registry for an Agent's OID (Object ID).
         """
-        # 1. Check Trusted List
         agent = AgentRegistry.TRUSTED_AGENTS.get(oid)
         if agent:
             return {
@@ -73,7 +90,6 @@ class AgentRegistry:
                 "trace_id": f"req-{random.randint(1000,9999)}-secure"
             }
         
-        # 2. Check Threat List
         threat = AgentRegistry.KNOWN_THREATS.get(oid)
         if threat:
              return {
@@ -85,7 +101,6 @@ class AgentRegistry:
                 "trace_id": f"alert-{random.randint(1000,9999)}-block"
             }
 
-        # 3. Default: Unknown/Untrusted
         return {
             "found": False,
             "is_trusted": False,
@@ -97,13 +112,21 @@ class AgentRegistry:
     @staticmethod
     def get_extended_graph_data(oid: str) -> Dict:
         """
-        Simulates a Microsoft Graph API call to fetch context.
+        Simulates Microsoft Graph API: Fetches relationship context and 'Memory' 
+        to support elderly/dementia users (Social Impact).
         """
-        if oid in AgentRegistry.TRUSTED_AGENTS:
-            return {
-                "relationship": "Assigned Case Worker",
-                "case_id": "CAS-29381-X9Y2",
-                "last_interaction": "2 days ago",
-                "email_verified": True
-            }
-        return {"relationship": "None", "case_id": None, "email_verified": False}
+        agent = AgentRegistry.TRUSTED_AGENTS.get(oid)
+        if agent and agent.get("graph_context"):
+            return agent["graph_context"]
+        return {"relationship": "None", "case_id": "N/A", "memory_recall": "No previous interaction"}
+        
+    @staticmethod
+    def check_conditional_access(oid: str, ip_address: str = "192.168.1.1") -> bool:
+        """
+        FEATURE: Conditional Access for Agents.
+        Blocks agents based on risk signals (Location Anomaly).
+        """
+        # Simulation: Block if IP simulates a "Risky Region"
+        if "Proxy" in ip_address or oid in AgentRegistry.KNOWN_THREATS:
+            return False # Block Access
+        return True # Allow Access

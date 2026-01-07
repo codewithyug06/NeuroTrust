@@ -5,6 +5,15 @@ from app.core.config import settings
 
 router = APIRouter()
 
+def check_prompt_injection(metadata: dict) -> bool:
+    """
+    FEATURE: Prompt Injection Protection.
+    Simulates Azure AI Content Safety (Prompt Shields) scanning for jailbreaks.
+    """
+    # In a real app, this would send text to Azure AI.
+    # Here we mock it. If it's an ATTACK scenario, we assume potential injection.
+    return metadata.get("risk_vector") == "INJECTION"
+
 @router.post("/analyze-stream")
 async def analyze_stream(payload: dict = Body(...)):
     """
@@ -14,6 +23,7 @@ async def analyze_stream(payload: dict = Body(...)):
     - Azure AI Content Safety (Visual)
     - Azure Speech Services (Audio)
     - C2PA Content Credentials Check
+    - **NEW: Prompt Injection Detection**
     """
     # 1. Simulate Heavy AI Processing
     if settings.SIMULATE_LATENCY:
@@ -24,12 +34,12 @@ async def analyze_stream(payload: dict = Body(...)):
     # --- DETAILED AI SIMULATION LOGIC ---
     
     if scenario == "ATTACK":
-        # Simulate detection of a Deepfake
+        # Simulate detection of a Deepfake AND Potential Prompt Injection
         return {
             "verdict": "SYNTHETIC_MEDIA_DETECTED",
             "risk_level": "CRITICAL",
             "confidence_score": 0.992,
-            "ai_models_used": ["ResNet-50", "Azure-Speech-Shield"],
+            "ai_models_used": ["ResNet-50", "Azure-Speech-Shield", "Azure-Prompt-Shield"],
             "anomalies": [
                 {
                     "frame_id": 1420,
@@ -44,11 +54,18 @@ async def analyze_stream(payload: dict = Body(...)):
                     "severity": "HIGH"
                 },
                 {
-                    "frame_id": 1430,
-                    "type": "TEXTURE_ARTIFACT",
-                    "description": "Inconsistent skin texture analysis (GAN signature)",
+                    "frame_id": 1428,
+                    "type": "PROMPT_INJECTION_RISK",
+                    "description": "Attempted jailbreak pattern detected in transcript", # FEATURE: Prompt Injection
                     "severity": "MEDIUM"
                 }
+            ],
+            "logs": [
+                "Azure Content Safety: FLAGGED (Severity 9/10)",
+                "Audio Watermark: NOT FOUND (C2PA Missing)",
+                "Lip-Sync Analysis: 200ms Latency Detected",
+                "Prompt Shield: SUSPICIOUS PATTERN DETECTED",
+                "Bio-Liveness Check: FAILED"
             ],
             "safety_score": 10
         }
@@ -58,8 +75,15 @@ async def analyze_stream(payload: dict = Body(...)):
         "verdict": "AUTHENTIC_MEDIA",
         "risk_level": "SAFE",
         "confidence_score": 0.985,
-        "ai_models_used": ["ResNet-50", "C2PA-Validator"],
+        "ai_models_used": ["ResNet-50", "C2PA-Validator", "Azure-Prompt-Shield"],
         "anomalies": [],
+        "logs": [
+            "Azure Content Safety: PASS (Severity 0/10)",
+            "Audio Watermark: VALID (Azure TTS Signed)",
+            "Lip-Sync Analysis: SYNC CONFIRMED",
+            "Prompt Shield: SAFE",
+            "Bio-Liveness Check: PASS"
+        ],
         "safety_score": 98,
         "metadata": {
             "audio_codec": "AAC-LC",
