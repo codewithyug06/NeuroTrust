@@ -1,48 +1,89 @@
-from fastapi import APIRouter, Depends
-from app.core.security import get_current_agent
+from fastapi import APIRouter, Header, HTTPException, Body, Depends
+from typing import Optional
+from app.core.config import settings
 from app.services.agent_registry import AgentRegistry
+import time
+import random
 
 router = APIRouter()
 
-@router.post("/verify-handshake")
-async def verify_handshake(agent_payload: dict = Depends(get_current_agent)):
+def simulate_crypto_challenge():
     """
-    The Reverse Turing Test API.
-    
-    1. Receives the Agent's Digital Passport (Token).
-    2. Checks if the Passport is Valid (Security).
-    3. Checks if the Agent is Trusted (Registry).
-    4. Returns the UI instruction (Green Shield vs. Red Warning).
+    NEW FUNCTION: Simulates the cryptographic challenge-response protocol
+    required by Microsoft Entra Verified ID.
     """
-    
-    agent_oid = agent_payload.get("oid")
-    agent_name = agent_payload.get("name", "Unknown")
-    
-    # Check the Registry
-    status = AgentRegistry.get_agent_status(agent_oid)
+    # In a real app, this verifies the signature against the public key.
+    # We simulate the processing overhead here.
+    time.sleep(0.1)
+    return True
 
-    # SCENARIO 1: RED LIGHT (The Hacker/Grandmother Attack)
-    if not status["is_trusted"]:
+@router.post("/verify-handshake")
+async def verify_handshake(
+    authorization: Optional[str] = Header(None),
+    payload: dict = Body(...)
+):
+    """
+    AEGIS PROTOCOL HANDSHAKE (Phase 1)
+    
+    This endpoint performs the 'Reverse Turing Test':
+    1. Receives the Caller's Digital Passport (simulated Entra ID Token).
+    2. Validates the Cryptographic Signature.
+    3. Returns a 'Trust Verdict' (Green/Red) to the User's Device.
+    """
+    
+    # 1. Simulate Network Latency
+    if settings.SIMULATE_LATENCY:
+        time.sleep(settings.LATENCY_HANDSHAKE_MS / 1000.0)
+
+    # 2. Extract Token
+    token = authorization.replace("Bearer ", "") if authorization else "unknown-token"
+    
+    # 3. Perform Cryptographic Verification (New Function)
+    is_signature_valid = simulate_crypto_challenge()
+    
+    input_oid = payload.get("oid")
+    
+    # 4. Registry Lookup
+    registry_result = AgentRegistry.lookup_agent(input_oid)
+    
+    # --- SCENARIO A: VERIFIED AGENT (Green Light) ---
+    if registry_result["is_trusted"] and is_signature_valid:
+        # Fetch extra context
+        graph_data = AgentRegistry.get_extended_graph_data(input_oid)
+        
         return {
-            "status": "BLOCKED",
-            "trust_score": 0,
-            "ui_action": "SHOW_RED_WARNING",
+            "status": "VERIFIED",
+            "trust_score": 98, 
+            "ui_action": "SHOW_GREEN_SHIELD",
             "details": {
-                "message": f"CRITICAL ALERT: '{agent_name}' is not verified.",
-                "reason": "Identity Signature Valid, but Agent not in Trust Registry.",
-                "recommendation": "Do not answer. Forwarding to voicemail."
+                "agent": registry_result["metadata"]["name"],
+                "tier": registry_result["metadata"]["tier"],
+                "message": "Identity Confirmed via Microsoft Entra.",
+                "c2pa_status": "VALID_SIGNATURE",
+                "accreditation": registry_result["metadata"]["accreditation"],
+                "context": graph_data
+            },
+            "telemetry": {
+                "latency_ms": settings.LATENCY_HANDSHAKE_MS,
+                "region": "East US 2",
+                "protocol": "Aegis-v2-Secure"
             }
         }
 
-    # SCENARIO 2: GREEN LIGHT (The Verified Bank Agent)
+    # --- SCENARIO B: KNOWN THREAT / UNVERIFIED (Red Light) ---
     return {
-        "status": "VERIFIED",
-        "trust_score": 100,
-        "ui_action": "SHOW_GREEN_SHIELD",
+        "status": "BLOCKED",
+        "trust_score": 12, 
+        "ui_action": "SHOW_RED_WARNING",
         "details": {
-            "message": "Secure Connection Established.",
-            "agent": status["metadata"]["name"],
-            "sponsor": status["metadata"]["sponsor"],
-            "session_id": "secure-session-8829-alpha"
+            "agent": "Unverified Caller",
+            "message": "CRITICAL: Identity Signature Missing.",
+            "reason": "Caller failed biometric challenge & C2PA check.",
+            "recommendation": "Do not engage. Call terminated."
+        },
+        "telemetry": {
+            "latency_ms": settings.LATENCY_HANDSHAKE_MS,
+            "region": "Unknown Proxy",
+            "protocol": "Block-v1"
         }
     }

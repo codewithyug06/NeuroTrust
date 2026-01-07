@@ -1,127 +1,116 @@
 import { useState, useEffect } from 'react';
-import { Shield, ShieldAlert, Activity, Globe, Lock, Server } from 'lucide-react';
+import { Shield, ShieldAlert, Activity, Globe, Lock, Server, MapPin, Zap } from 'lucide-react';
 
 export default function Dashboard({ onBack }) {
-  const [stats, setStats] = useState({
-    verified: 14205,
-    blocked: 892,
-    active: 34
-  });
+  const [logs, setLogs] = useState([]);
+  const [stats, setStats] = useState({ verified: 14205, blocked: 892 });
+  const [threatLevel, setThreatLevel] = useState("LOW");
 
-  const [logs, setLogs] = useState([
-    { id: 1, time: "10:42:01", type: "VERIFIED", loc: "New York, USA", msg: "Entra ID Confirmed" },
-    { id: 2, time: "10:42:05", type: "BLOCKED", loc: "Moscow, RU", msg: "Deepfake Audio Detect" },
-    { id: 3, time: "10:42:12", type: "VERIFIED", loc: "London, UK", msg: "Biometric Match" },
-  ]);
-
-  // Simulate Live Data
+  // Simulate Microsoft Fabric Real-Time Stream with Dynamic Threat Levels
   useEffect(() => {
     const interval = setInterval(() => {
+      const isAttack = Math.random() > 0.7; // 30% chance of attack
+      
+      const newLog = {
+        id: Date.now(),
+        time: new Date().toLocaleTimeString('en-US', { hour12: false }),
+        type: isAttack ? "BLOCKED" : "VERIFIED",
+        loc: isAttack ? ["Moscow, RU", "Unknown Proxy", "Pyongyang, KP"][Math.floor(Math.random()*3)] : ["New York, US", "London, UK", "Tokyo, JP"][Math.floor(Math.random()*3)],
+        msg: isAttack ? "Deepfake Signature Detected (ResNet-50)" : "Entra ID Handshake Confirmed"
+      };
+      
+      setLogs(prev => [newLog, ...prev.slice(0, 7)]); 
+      
       setStats(prev => ({
-        verified: prev.verified + Math.floor(Math.random() * 3),
-        blocked: prev.blocked + (Math.random() > 0.7 ? 1 : 0),
-        active: prev.active
+        verified: prev.verified + (isAttack ? 0 : 1),
+        blocked: prev.blocked + (isAttack ? 1 : 0)
       }));
 
-      const newLog = Math.random() > 0.7 
-        ? { id: Date.now(), time: new Date().toLocaleTimeString(), type: "BLOCKED", loc: "Unknown IP", msg: "Synthetic Video Signature" }
-        : { id: Date.now(), time: new Date().toLocaleTimeString(), type: "VERIFIED", loc: "California, USA", msg: "Secure Handshake" };
+      // Dynamic Threat Level
+      setThreatLevel(isAttack ? "ELEVATED" : "LOW");
 
-      setLogs(prev => [newLog, ...prev.slice(0, 6)]);
-    }, 2000);
+    }, 1200);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gray-950 text-white font-mono p-6">
-      
+    <div className="w-full h-screen bg-gray-950 bg-grid text-white p-6 flex flex-col font-mono">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
-        <div className="flex items-center gap-3">
+      <div className="flex justify-between items-center border-b border-gray-800 pb-4 mb-4 bg-gray-950/80 backdrop-blur">
+        <div className="flex items-center gap-4">
           <Shield className="w-8 h-8 text-blue-500" />
           <div>
-            <h1 className="text-2xl font-bold tracking-wider">AEGIS <span className="text-blue-500">GLOBAL INTELLIGENCE</span></h1>
-            <p className="text-xs text-gray-500">MICROSOFT FABRIC REAL-TIME ANALYTICS</p>
+            <h1 className="text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">AEGIS <span className="text-white">OVERWATCH</span></h1>
+            <p className="text-[10px] text-gray-500 tracking-[0.3em]">MICROSOFT FABRIC REAL-TIME INTELLIGENCE</p>
           </div>
         </div>
-        <button onClick={onBack} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded border border-gray-700 text-xs">
-          RETURN TO DEVICE VIEW
+        <button onClick={onBack} className="px-4 py-2 bg-gray-900 hover:bg-gray-800 border border-gray-700 rounded text-xs transition-all flex items-center gap-2 text-blue-400">
+          &larr; RETURN TO DEVICE VIEW
         </button>
       </div>
 
-      {/* STATS GRID */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-900/50 p-4 rounded border border-gray-800">
-          <div className="text-gray-400 text-xs uppercase mb-1">Secure Sessions</div>
-          <div className="text-3xl font-bold text-green-400">{stats.verified.toLocaleString()}</div>
-        </div>
-        <div className="bg-gray-900/50 p-4 rounded border border-gray-800">
-          <div className="text-gray-400 text-xs uppercase mb-1">Threats Neutralized</div>
-          <div className="text-3xl font-bold text-red-500">{stats.blocked.toLocaleString()}</div>
-        </div>
-        <div className="bg-gray-900/50 p-4 rounded border border-gray-800">
-          <div className="text-gray-400 text-xs uppercase mb-1">Active Nodes</div>
-          <div className="text-3xl font-bold text-blue-400">8,420</div>
-        </div>
-        <div className="bg-gray-900/50 p-4 rounded border border-gray-800 flex items-center justify-center gap-2">
-           <Activity className="animate-pulse text-green-500" />
-           <span className="text-sm font-bold">SYSTEM OPTIMAL</span>
-        </div>
-      </div>
-
-      {/* MAIN CONTENT: MAP & LOGS */}
-      <div className="grid grid-cols-3 gap-6 h-[500px]">
+      {/* DASHBOARD GRID */}
+      <div className="grid grid-cols-12 gap-6 flex-1">
         
-        {/* WORLD MAP (Visual Simulation) */}
-        <div className="col-span-2 bg-black rounded-xl border border-gray-800 relative overflow-hidden flex items-center justify-center">
-          {/* Background Map Image */}
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png" 
-            className="opacity-20 w-full object-cover invert"
-            alt="World Map"
-          />
+        {/* LEFT COLUMN: LIVE METRICS */}
+        <div className="col-span-4 space-y-4">
           
-          {/* Simulated Pings */}
-          <div className="absolute top-[30%] left-[20%] w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
-          <div className="absolute top-[35%] left-[22%] w-2 h-2 bg-green-500 rounded-full"></div>
-          
-          <div className="absolute top-[40%] right-[30%] w-4 h-4 bg-red-600 rounded-full animate-ping"></div>
-          <div className="absolute top-[40%] right-[30%] w-2 h-2 bg-red-600 rounded-full"></div>
+          {/* THREAT MONITOR */}
+          <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+            <span className="text-xs text-gray-400 uppercase">Global Threat Level</span>
+            <span className={`text-sm font-bold px-2 py-1 rounded ${threatLevel === 'ELEVATED' ? 'bg-red-900/50 text-red-400 animate-pulse' : 'bg-green-900/50 text-green-400'}`}>
+                {threatLevel}
+            </span>
+          </div>
 
-          <div className="absolute bottom-[30%] right-[20%] w-3 h-3 bg-green-500 rounded-full animate-ping delay-700"></div>
+          <div className="bg-gray-900/50 p-6 rounded-xl border border-green-900/30 relative">
+             <div className="absolute top-0 right-0 p-2 opacity-20"><Lock className="w-12 h-12 text-green-500"/></div>
+             <div className="text-gray-400 text-xs uppercase mb-1">Secure Sessions</div>
+             <div className="text-4xl font-mono text-green-400">{stats.verified.toLocaleString()}</div>
+          </div>
           
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-          <div className="absolute bottom-4 left-4 text-xs text-gray-500">
-            <Globe className="w-4 h-4 inline mr-2" />
-            Live Threat Vector Map (KQL Stream)
+          <div className="bg-gray-900/50 p-6 rounded-xl border border-red-900/30 relative">
+             <div className="absolute top-0 right-0 p-2 opacity-20"><ShieldAlert className="w-12 h-12 text-red-500"/></div>
+             <div className="text-gray-400 text-xs uppercase mb-1">Threats Neutralized</div>
+             <div className="text-4xl font-mono text-red-500">{stats.blocked.toLocaleString()}</div>
+          </div>
+
+          {/* STREAM LOGS */}
+          <div className="bg-black p-4 rounded-xl border border-gray-800 h-[300px] overflow-hidden">
+             <div className="flex items-center gap-2 mb-4 text-[10px] font-bold text-gray-500 uppercase border-b border-gray-800 pb-2">
+                <Server className="w-3 h-3"/> KQL Event Stream
+             </div>
+             <div className="space-y-2">
+               {logs.map(log => (
+                 <div key={log.id} className="text-[10px] flex gap-2 border-l-2 pl-2 animate-pulse" 
+                      style={{borderColor: log.type === 'VERIFIED' ? '#22c55e' : '#ef4444'}}>
+                   <span className="text-gray-500">[{log.time}]</span>
+                   <span className={log.type === "VERIFIED" ? "text-green-500 font-bold" : "text-red-500 font-bold"}>{log.type}</span>
+                   <span className="text-gray-400 truncate w-32">{log.msg}</span>
+                   <span className="text-gray-600 text-[8px]">{log.loc}</span>
+                 </div>
+               ))}
+             </div>
           </div>
         </div>
 
-        {/* LIVE LOGS */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 overflow-hidden">
-          <div className="flex items-center gap-2 mb-4 text-sm font-bold text-gray-400 uppercase tracking-widest border-b border-gray-800 pb-2">
-            <Server className="w-4 h-4" /> Incoming Signals
+        {/* RIGHT COLUMN: MAP VISUALIZATION */}
+        <div className="col-span-8 bg-black rounded-xl border border-gray-800 relative overflow-hidden flex items-center justify-center group">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png" 
+            className="w-[95%] opacity-30 invert transition-transform duration-[10s] group-hover:scale-105" alt="Global Map" />
+          
+          <div className="absolute top-[30%] left-[22%] group-hover:scale-125 transition-transform">
+            <span className="absolute w-3 h-3 bg-green-500 rounded-full animate-ping opacity-75"></span>
+            <span className="relative w-1.5 h-1.5 bg-green-500 rounded-full"></span>
           </div>
-          <div className="space-y-3">
-            {logs.map((log) => (
-              <div key={log.id} className="flex items-start gap-3 text-xs animate-pulse-fast">
-                {log.type === "VERIFIED" ? (
-                  <Lock className="w-4 h-4 text-green-500 shrink-0" />
-                ) : (
-                  <ShieldAlert className="w-4 h-4 text-red-500 shrink-0" />
-                )}
-                <div>
-                  <div className="flex gap-2">
-                    <span className="text-gray-500 font-mono">{log.time}</span>
-                    <span className={log.type === "VERIFIED" ? "text-green-400 font-bold" : "text-red-400 font-bold"}>
-                      {log.type}
-                    </span>
-                  </div>
-                  <div className="text-gray-300">{log.msg}</div>
-                  <div className="text-gray-600 text-[10px]">{log.loc}</div>
-                </div>
-              </div>
-            ))}
+          <div className="absolute top-[28%] right-[40%] group-hover:scale-125 transition-transform">
+            <span className="absolute w-6 h-6 bg-red-600 rounded-full animate-ping opacity-50"></span>
+            <span className="relative w-2 h-2 bg-red-600 rounded-full shadow-[0_0_20px_red]"></span>
+          </div>
+
+           <div className="absolute bottom-6 right-6 text-xs text-blue-400 font-mono flex items-center gap-2 bg-black/80 p-2 rounded border border-blue-900/50">
+             <Activity className="w-4 h-4 animate-spin"/>
+             SYSTEM STATUS: OPERATIONAL
           </div>
         </div>
 

@@ -1,34 +1,41 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import handshake, analysis  # <--- IMPORT ANALYSIS
 from app.core.config import settings
+from app.api.endpoints import handshake, analysis 
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Universal Trust Protocol Middleware",
-    version="1.0.0",
-    docs_url="/docs"
+    version=settings.VERSION,
+    description="Backend service for Aegis: The Universal Trust Protocol. Powered by Microsoft Entra & Azure AI.",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
-# Enable CORS so your React Frontend can talk to this Backend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# --- MIDDLEWARE ---
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["POST", "GET", "OPTIONS"],
+        allow_headers=["*"],
+    )
 
-# Register the Routes
+# --- ROUTER REGISTRATION ---
 app.include_router(handshake.router, prefix=settings.API_V1_STR)
-app.include_router(analysis.router, prefix=settings.API_V1_STR) # <--- REGISTER IT
+app.include_router(analysis.router, prefix=settings.API_V1_STR) 
 
-@app.get("/")
+@app.get("/health")
 def health_check():
+    """
+    Heartbeat endpoint.
+    """
     return {
-        "system": "Aegis Trust Protocol", 
-        "status": "ONLINE",
-        "phase": "PHASE_2_COMPLETE"
+        "status": "online",
+        "system": "Aegis Core",
+        "version": settings.VERSION,
+        "mode": "MOCK_SIMULATION" if settings.USE_MOCK_SERVICES else "PRODUCTION",
+        "fabric_stream": "connected"
     }
 
 if __name__ == "__main__":
