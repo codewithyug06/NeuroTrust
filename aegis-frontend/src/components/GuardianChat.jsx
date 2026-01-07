@@ -20,4 +20,4 @@ export default function GuardianChat({ status }) {
       </div>
     </div>
   );
-}
+}   
