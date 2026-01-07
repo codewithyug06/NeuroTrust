@@ -23,12 +23,15 @@ class Settings(BaseSettings):
     CLIENT_SECRET: str = "mock-client-secret-value"
     AUTHORITY: str = f"https://login.microsoftonline.com/{TENANT_ID}"
     
-    # --- CORS CONFIGURATION ---
+    # --- CORS CONFIGURATION (UPDATED FOR YOUR PHONE) ---
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        # YOUR COMPUTER'S NETWORK IP (For Phone Access)
+        "http://172.20.10.11:5173",
+        "http://172.20.10.11:8000"
     ]
 
     # --- ADVANCED SIMULATION FLAGS ---
@@ -36,10 +39,9 @@ class Settings(BaseSettings):
     USE_MOCK_SERVICES: bool = True 
     
     # Latency Simulation to mimic real 5G network round-trip time.
-    # This makes the "Scanning..." animation on the frontend look realistic.
     SIMULATE_LATENCY: bool = True
-    LATENCY_HANDSHAKE_MS: int = 1200  # Slowed down so judges can see the "Identity" step
-    LATENCY_ANALYSIS_MS: int = 2000   # Slowed down so judges can see the "AI Scanning" step
+    LATENCY_HANDSHAKE_MS: int = 1200 
+    LATENCY_ANALYSIS_MS: int = 2000 
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:

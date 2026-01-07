@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Shield, ShieldAlert, Phone, Video, Mic, Lock, Activity, LayoutDashboard, ScanLine, AlertTriangle, CheckCircle, Database, Cpu, Fingerprint, Bot, Brain, Info, Wifi, Eye } from 'lucide-react'
 import Dashboard from './Dashboard';
 
-const API_URL = "http://localhost:8000/api/v1";
+// UPDATED TO YOUR SPECIFIC IP ADDRESS
+const API_URL = "http://172.20.10.11:8000/api/v1";
 
 export default function App() {
   const [view, setView] = useState("PHONE");
