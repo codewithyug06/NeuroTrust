@@ -6,11 +6,11 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """
     Global Configuration for Aegis Trust Protocol.
-    Includes "Production-Grade" simulation settings for the Imagine Cup demo.
+    Includes 'Production-Grade' simulation settings for the Imagine Cup demo.
     """
     # --- PROJECT IDENTIFICATION ---
     PROJECT_NAME: str = "Aegis Trust Protocol"
-    VERSION: str = "3.1.0-rc (Imagine Cup Final)"
+    VERSION: str = "4.0.0-final (Imagine Cup Gold)"
     API_V1_STR: str = "/api/v1"
     
     # --- SECURITY CONFIGURATION (HARDCODED FOR DEMO STABILITY) ---
@@ -32,13 +32,14 @@ class Settings(BaseSettings):
     ]
 
     # --- ADVANCED SIMULATION FLAGS ---
-    # Ensures zero downtime during the presentation
+    # MASTER SWITCH: Ensures the app runs even if Azure is unreachable.
     USE_MOCK_SERVICES: bool = True 
     
-    # Latency Simulation to mimic real 5G network round-trip time
+    # Latency Simulation to mimic real 5G network round-trip time.
+    # This makes the "Scanning..." animation on the frontend look realistic.
     SIMULATE_LATENCY: bool = True
-    LATENCY_HANDSHAKE_MS: int = 800  # Identity Check (Fast)
-    LATENCY_ANALYSIS_MS: int = 1500  # AI Media Analysis (Heavy)
+    LATENCY_HANDSHAKE_MS: int = 1200  # Slowed down so judges can see the "Identity" step
+    LATENCY_ANALYSIS_MS: int = 2000   # Slowed down so judges can see the "AI Scanning" step
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:

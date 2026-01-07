@@ -6,10 +6,9 @@ export default function Dashboard({ onBack }) {
   const [stats, setStats] = useState({ verified: 14205, blocked: 892 });
   const [threatLevel, setThreatLevel] = useState("LOW");
 
-  // Simulate Microsoft Fabric Real-Time Stream with Dynamic Threat Levels
   useEffect(() => {
     const interval = setInterval(() => {
-      const isAttack = Math.random() > 0.7; // 30% chance of attack
+      const isAttack = Math.random() > 0.7; 
       
       const newLog = {
         id: Date.now(),
@@ -26,7 +25,6 @@ export default function Dashboard({ onBack }) {
         blocked: prev.blocked + (isAttack ? 1 : 0)
       }));
 
-      // Dynamic Threat Level
       setThreatLevel(isAttack ? "ELEVATED" : "LOW");
 
     }, 1200);
@@ -54,28 +52,22 @@ export default function Dashboard({ onBack }) {
         
         {/* LEFT COLUMN: LIVE METRICS */}
         <div className="col-span-4 space-y-4">
-          
-          {/* THREAT MONITOR */}
           <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-800 flex items-center justify-between">
             <span className="text-xs text-gray-400 uppercase">Global Threat Level</span>
             <span className={`text-sm font-bold px-2 py-1 rounded ${threatLevel === 'ELEVATED' ? 'bg-red-900/50 text-red-400 animate-pulse' : 'bg-green-900/50 text-green-400'}`}>
                 {threatLevel}
             </span>
           </div>
-
           <div className="bg-gray-900/50 p-6 rounded-xl border border-green-900/30 relative">
              <div className="absolute top-0 right-0 p-2 opacity-20"><Lock className="w-12 h-12 text-green-500"/></div>
              <div className="text-gray-400 text-xs uppercase mb-1">Secure Sessions</div>
              <div className="text-4xl font-mono text-green-400">{stats.verified.toLocaleString()}</div>
           </div>
-          
           <div className="bg-gray-900/50 p-6 rounded-xl border border-red-900/30 relative">
              <div className="absolute top-0 right-0 p-2 opacity-20"><ShieldAlert className="w-12 h-12 text-red-500"/></div>
              <div className="text-gray-400 text-xs uppercase mb-1">Threats Neutralized</div>
              <div className="text-4xl font-mono text-red-500">{stats.blocked.toLocaleString()}</div>
           </div>
-
-          {/* STREAM LOGS */}
           <div className="bg-black p-4 rounded-xl border border-gray-800 h-[300px] overflow-hidden">
              <div className="flex items-center gap-2 mb-4 text-[10px] font-bold text-gray-500 uppercase border-b border-gray-800 pb-2">
                 <Server className="w-3 h-3"/> KQL Event Stream
@@ -98,7 +90,6 @@ export default function Dashboard({ onBack }) {
         <div className="col-span-8 bg-black rounded-xl border border-gray-800 relative overflow-hidden flex items-center justify-center group">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png" 
             className="w-[95%] opacity-30 invert transition-transform duration-[10s] group-hover:scale-105" alt="Global Map" />
-          
           <div className="absolute top-[30%] left-[22%] group-hover:scale-125 transition-transform">
             <span className="absolute w-3 h-3 bg-green-500 rounded-full animate-ping opacity-75"></span>
             <span className="relative w-1.5 h-1.5 bg-green-500 rounded-full"></span>
@@ -106,11 +97,6 @@ export default function Dashboard({ onBack }) {
           <div className="absolute top-[28%] right-[40%] group-hover:scale-125 transition-transform">
             <span className="absolute w-6 h-6 bg-red-600 rounded-full animate-ping opacity-50"></span>
             <span className="relative w-2 h-2 bg-red-600 rounded-full shadow-[0_0_20px_red]"></span>
-          </div>
-
-           <div className="absolute bottom-6 right-6 text-xs text-blue-400 font-mono flex items-center gap-2 bg-black/80 p-2 rounded border border-blue-900/50">
-             <Activity className="w-4 h-4 animate-spin"/>
-             SYSTEM STATUS: OPERATIONAL
           </div>
         </div>
 

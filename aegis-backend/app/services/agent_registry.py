@@ -20,7 +20,8 @@ class AgentRegistry:
             "expiry": "2030-01-01T00:00:00Z",
             "accreditation": "FDIC Insured Contact Center",
             "c2pa_profile": "Standard_Banking_v1",
-            "reputation_score": 99.9
+            "reputation_score": 99.9,
+            "verification_proof": "Entra_Verifiable_Credential_v2"
         },
         "microsoft-support-id": {
             "name": "Microsoft Azure Support",
@@ -30,7 +31,8 @@ class AgentRegistry:
             "issued_at": "2025-05-12T10:00:00Z",
             "accreditation": "Official Partner",
             "c2pa_profile": "MS_Enterprise_v2",
-            "reputation_score": 100.0
+            "reputation_score": 100.0,
+            "verification_proof": "Entra_Verifiable_Credential_v2"
         }
     }
 
@@ -42,7 +44,15 @@ class AgentRegistry:
             "threat_vector": "Synthetic Voice / Deepfake Video",
             "reported_count": 1420,
             "last_seen_location": "Unknown Proxy",
-            "associated_botnet": "DarkNexus-v4"
+            "associated_botnet": "DarkNexus-v4",
+            "verification_proof": "MISSING_SIGNATURE"
+        },
+        "bot-net-id": {
+            "name": "Automated Dialer",
+            "risk_level": "HIGH",
+            "threat_vector": "Spam / Phishing",
+            "reported_count": 50000,
+            "verification_proof": "REVOKED_CERTIFICATE"
         }
     }
 
@@ -87,13 +97,13 @@ class AgentRegistry:
     @staticmethod
     def get_extended_graph_data(oid: str) -> Dict:
         """
-        NEW FUNCTION: Simulates a Microsoft Graph API call to fetch
-        relationship context (e.g., 'Is this agent assigned to my case?').
+        Simulates a Microsoft Graph API call to fetch context.
         """
         if oid in AgentRegistry.TRUSTED_AGENTS:
             return {
                 "relationship": "Assigned Case Worker",
                 "case_id": "CAS-29381-X9Y2",
-                "last_interaction": "2 days ago"
+                "last_interaction": "2 days ago",
+                "email_verified": True
             }
-        return {"relationship": "None", "case_id": None}
+        return {"relationship": "None", "case_id": None, "email_verified": False}

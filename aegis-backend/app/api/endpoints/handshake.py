@@ -9,11 +9,8 @@ router = APIRouter()
 
 def simulate_crypto_challenge():
     """
-    NEW FUNCTION: Simulates the cryptographic challenge-response protocol
-    required by Microsoft Entra Verified ID.
+    Simulates the cryptographic challenge-response protocol.
     """
-    # In a real app, this verifies the signature against the public key.
-    # We simulate the processing overhead here.
     time.sleep(0.1)
     return True
 
@@ -24,11 +21,6 @@ async def verify_handshake(
 ):
     """
     AEGIS PROTOCOL HANDSHAKE (Phase 1)
-    
-    This endpoint performs the 'Reverse Turing Test':
-    1. Receives the Caller's Digital Passport (simulated Entra ID Token).
-    2. Validates the Cryptographic Signature.
-    3. Returns a 'Trust Verdict' (Green/Red) to the User's Device.
     """
     
     # 1. Simulate Network Latency
@@ -38,7 +30,7 @@ async def verify_handshake(
     # 2. Extract Token
     token = authorization.replace("Bearer ", "") if authorization else "unknown-token"
     
-    # 3. Perform Cryptographic Verification (New Function)
+    # 3. Perform Cryptographic Verification
     is_signature_valid = simulate_crypto_challenge()
     
     input_oid = payload.get("oid")
@@ -61,13 +53,15 @@ async def verify_handshake(
                 "message": "Identity Confirmed via Microsoft Entra.",
                 "c2pa_status": "VALID_SIGNATURE",
                 "accreditation": registry_result["metadata"]["accreditation"],
+                "proof": registry_result["metadata"]["verification_proof"],
                 "context": graph_data
             },
-            "telemetry": {
-                "latency_ms": settings.LATENCY_HANDSHAKE_MS,
-                "region": "East US 2",
-                "protocol": "Aegis-v2-Secure"
-            }
+            "logs": [
+                "Entra ID Token Decoded...",
+                "DID Resolution: did:ion:... Success",
+                "Public Key Match: 0x7A8B9C...",
+                "Graph API: Relationship Confirmed"
+            ]
         }
 
     # --- SCENARIO B: KNOWN THREAT / UNVERIFIED (Red Light) ---
@@ -79,11 +73,13 @@ async def verify_handshake(
             "agent": "Unverified Caller",
             "message": "CRITICAL: Identity Signature Missing.",
             "reason": "Caller failed biometric challenge & C2PA check.",
-            "recommendation": "Do not engage. Call terminated."
+            "recommendation": "Do not engage. Call terminated.",
+            "proof": "INVALID"
         },
-        "telemetry": {
-            "latency_ms": settings.LATENCY_HANDSHAKE_MS,
-            "region": "Unknown Proxy",
-            "protocol": "Block-v1"
-        }
+        "logs": [
+            "Entra ID Token Missing or Invalid...",
+            "DID Resolution: Failed",
+            "Anomaly: High-Risk IP detected",
+            "Blocklist Check: MATCH FOUND (DarkNexus-v4)"
+        ]
     }
