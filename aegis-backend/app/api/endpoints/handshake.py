@@ -3,7 +3,23 @@ from typing import Optional
 from app.core.config import settings
 from app.services.agent_registry import AgentRegistry
 import time
+import time
 import random
+import uuid
+from pydantic import BaseModel
+
+class TelemetryData(BaseModel):
+    latency_ms: float
+    region: str
+    protocol: str
+
+class HandshakeResponse(BaseModel):
+    status: str
+    trust_score: int
+    ui_action: str
+    details: dict
+    logs: list[str]
+    telemetry: TelemetryData
 
 router = APIRouter()
 
@@ -14,7 +30,7 @@ def simulate_crypto_challenge():
     time.sleep(0.1)
     return True
 
-@router.post("/verify-handshake")
+@router.post("/verify-handshake", response_model=HandshakeResponse)
 async def verify_handshake(
     authorization: Optional[str] = Header(None),
     payload: dict = Body(...)
@@ -84,6 +100,8 @@ async def verify_handshake(
     failure_reason = "Identity Signature Missing"
     if not is_compliant:
         failure_reason = "Conditional Access Policy Violation (High Risk Location)"
+        
+    trace_id = str(uuid.uuid4())[:8]
 
     return {
         "status": "BLOCKED",
@@ -97,6 +115,7 @@ async def verify_handshake(
             "proof": "INVALID"
         },
         "logs": [
+            f"Trace ID: {trace_id}",
             "Entra ID Token Missing or Invalid...",
             "DID Resolution: Failed",
             "Anomaly: High-Risk IP detected (Geo-fencing)",
@@ -105,7 +124,44 @@ async def verify_handshake(
         ],
         "telemetry": {
             "latency_ms": settings.LATENCY_HANDSHAKE_MS,
-            "region": "Unknown Proxy",
+            "region": "Tor Relay / Proxy",
             "protocol": "Block-v1"
         }
     }
+
+@router.get("/agents")
+async def get_verified_agents():
+    """
+    Returns the Registry of Verified Agents for the Dashboard.
+    """
+    time.sleep(0.5) # Sim DB latency
+    return [
+        { 
+            "name": "Bank of America", 
+            "id": "did:ion:Fi8s...2A", 
+            "trust": 99, 
+            "category": "Finance",
+            "metadata": { "sponsor": "Microsoft", "bond": "$5,000,000", "hash": "sha256:bofa-v4" }
+        },
+        { 
+            "name": "Delta Airlines", 
+            "id": "did:web:delta.com", 
+            "trust": 98, 
+            "category": "Travel",
+            "metadata": { "sponsor": "Delta Corp", "bond": "$2,000,000", "hash": "sha256:delta-v2" }
+        },
+        { 
+            "name": "Microsoft Support", 
+            "id": "did:web:microsoft.com", 
+            "trust": 100, 
+            "category": "Tech",
+            "metadata": { "sponsor": "Microsoft", "bond": "$100,000,000", "hash": "sha256:ms-sup-v9" }
+        },
+        { 
+            "name": "Kaiser Permanente", 
+            "id": "did:ion:kp.org:agent", 
+            "trust": 97, 
+            "category": "Health",
+            "metadata": { "sponsor": "Kaiser", "bond": "$10,000,000", "hash": "sha256:kp-tele-v1" }
+        }
+    ]
