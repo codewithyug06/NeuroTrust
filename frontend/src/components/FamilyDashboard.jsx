@@ -75,9 +75,9 @@ export default function FamilyDashboard({ onBack }) {
                         <div className="h-full bg-red-500 animate-[width_2s_ease-in-out_forwards]" style={{ width: '0%' }}></div>
                     </div>
                     <div className="mt-4 font-mono text-xs text-red-300">
-                        > TERMINATING AUDIO STREAM... <br />
-                        > INJECTING PROTECTIVE PROMPT... <br />
-                        > DISCONNECTING ADVERSARY...
+                        &gt; TERMINATING AUDIO STREAM... <br />
+                        &gt; INJECTING PROTECTIVE PROMPT... <br />
+                        &gt; DISCONNECTING ADVERSARY...
                     </div>
                 </div>
             )}
