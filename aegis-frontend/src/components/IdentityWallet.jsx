@@ -15,7 +15,7 @@ export default function IdentityWallet({ onClose }) {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in" onClick={onClose}>
-            <div className="w-full max-w-5xl h-[650px] relative" onClick={e => e.stopPropagation()}>
+            <div className="w-full max-w-5xl h-[650px] max-h-[90vh] relative" onClick={e => e.stopPropagation()}>
                 <GlassCard className="h-full !p-0 flex overflow-hidden border-guardian-blue/30 shadow-[0_0_100px_rgba(59,130,246,0.15)]">
 
                     {/* BUTTON CLOSE Absolute */}
@@ -43,8 +43,8 @@ export default function IdentityWallet({ onClose }) {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`w-full text-left px-4 py-3.5 rounded-xl text-sm font-bold flex items-center gap-3 transition-all duration-300 border ${activeTab === tab.id
-                                            ? 'bg-guardian-blue/20 text-white border-guardian-blue/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]'
-                                            : 'text-gray-500 hover:text-white hover:bg-white/5 border-transparent'
+                                        ? 'bg-guardian-blue/20 text-white border-guardian-blue/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]'
+                                        : 'text-gray-500 hover:text-white hover:bg-white/5 border-transparent'
                                         }`}
                                 >
                                     <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-guardian-blue' : ''}`} />

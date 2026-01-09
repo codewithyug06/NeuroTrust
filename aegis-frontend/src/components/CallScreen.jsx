@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PhoneMissed, PhoneIncoming, Shield, ScanLine, Activity, CheckCircle, Brain, Siren, Lock, Ban, ShieldAlert } from 'lucide-react';
 import TrustAnalysisPanel from './TrustAnalysisPanel';
+import ProgressiveIdentityReveal from './ProgressiveIdentityReveal';
 
 export default function CallScreen({
     status,
@@ -13,6 +14,7 @@ export default function CallScreen({
     verificationData = null // Result from Handshake
 }) {
     const [waveformHeight, setWaveformHeight] = useState([20, 40, 60, 30, 50]);
+    const [isVerifying, setIsVerifying] = useState(false); // New State for Progressive Animation
 
     // Simulate Audio Waveform
     useEffect(() => {
@@ -55,6 +57,20 @@ export default function CallScreen({
         );
     }
 
+    // --- PROGRESSIVE REVEAL OVERLAY (Level 3) ---
+    // MUST BE BEFORE "CONNECTED" STATE TO INTERCEPT
+    if (isVerifying && status === 'CONNECTED') {
+        return (
+            <ProgressiveIdentityReveal
+                isSafe={isSafeMode}
+                onComplete={() => {
+                    setIsVerifying(false);
+                    onVerify(); // Trigger actual backend call after animation
+                }}
+            />
+        );
+    }
+
     if (status === "CONNECTED") {
         return (
             <div className={`absolute inset-0 z-30 flex flex-col justify-end pb-24 px-6 ${elderlyMode ? 'bg-white/90 justify-center pb-0' : 'bg-gradient-to-t from-black/90 via-transparent to-transparent'}`}>
@@ -70,14 +86,14 @@ export default function CallScreen({
                 {!elderlyMode ? (
                     <>
                         <div className="text-center text-xs text-gray-400 mb-4 font-mono">IDENTITY UNVERIFIED</div>
-                        <button onClick={onVerify} className="w-full py-4 bg-blue-600 border border-blue-400/50 hover:bg-blue-500 text-white font-bold rounded-xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
+                        <button onClick={() => setIsVerifying(true)} className="w-full py-4 bg-blue-600 border border-blue-400/50 hover:bg-blue-500 text-white font-bold rounded-xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
                             <Shield className="w-5 h-5 fill-white/20" /> <span>VERIFY IDENTITY</span>
                         </button>
                     </>
                 ) : (
                     <div className="flex flex-col items-center gap-8">
                         <p className="text-black text-2xl font-bold text-center">Is this person safe?</p>
-                        <button onClick={onVerify} className="w-64 h-64 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-black text-3xl shadow-2xl flex flex-col items-center justify-center gap-4 animate-pulse">
+                        <button onClick={() => setIsVerifying(true)} className="w-64 h-64 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-black text-3xl shadow-2xl flex flex-col items-center justify-center gap-4 animate-pulse">
                             <Shield className="w-24 h-24" />
                             <span>CHECK<br />SAFETY</span>
                         </button>
@@ -86,6 +102,8 @@ export default function CallScreen({
             </div>
         );
     }
+
+
 
     if (status === "ANALYZING") {
         return (
@@ -125,7 +143,45 @@ export default function CallScreen({
                     </div>
                 ) : (
                     /* NORMAL MODE: DETAILED VIEW */
-                    canRenderPanel && <TrustAnalysisPanel data={verificationData} />
+                    canRenderPanel ? (
+                        <>
+                            <TrustAnalysisPanel data={verificationData} />
+
+                            {/* ADVANCED: PSYCHOLOGICAL ALERT OVERLAY */}
+                            {verificationData.details?.psychological_triggers?.length > 0 && (
+                                <div className="absolute top-24 left-8 animate-slide-in-left z-40">
+                                    <div className="bg-red-950/90 border border-red-500 rounded-xl p-4 shadow-[0_0_50px_rgba(220,38,38,0.4)] backdrop-blur-md max-w-xs animate-pulse-glow">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Brain className="w-8 h-8 text-red-500 animate-pulse" />
+                                            <div>
+                                                <div className="text-xs font-black text-red-500 uppercase tracking-widest">PSYCH-OPS DETECTED</div>
+                                                <div className="text-[10px] text-red-300 font-mono">MANIPULATION ATTEMPT</div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {verificationData.details.psychological_triggers.map((trigger, i) => (
+                                                <div key={i} className="bg-red-500/10 rounded p-2 border-l-2 border-red-500">
+                                                    <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
+                                                        <Activity className="w-3 h-3" /> {trigger.type}
+                                                    </div>
+                                                    <div className="text-[10px] text-red-200 leading-tight mt-1 opacity-80">
+                                                        {trigger.description}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        // DEBUG / ERROR STATE IF DATA MISSING
+                        <div className="absolute top-24 left-8 p-4 bg-red-500/80 text-white font-mono text-xs rounded border border-red-200">
+                            DATA INTEGRITY ERROR
+                            <br />Layer Details: {verificationData.layer_details ? 'OK' : 'MISSING'}
+                            <br />Pipeline Trace: {verificationData.pipeline_trace ? 'OK' : 'MISSING'}
+                        </div>
+                    )
                 )}
 
                 {/* --- GUARDIAN INTERVENTION (SCENARIO B) --- */}

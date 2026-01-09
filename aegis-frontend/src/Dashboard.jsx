@@ -20,34 +20,48 @@ export default function Dashboard({ onBack }) {
   const [inputError, setInputError] = useState(false);
   const [showWallet, setShowWallet] = useState(false);
 
+  // --- MOCK DATA & STATE ---
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const [agentsList, setAgentsList] = useState([]);
 
-  // --- MOCK DATA ---
-  const threatsBlocked = 14205;
-  const activeNodes = 843;
-  const blips = [
-    { id: 1, top: '35%', left: '22%', color: 'shadow-[0_0_15px_rgba(239,68,68,0.8)] bg-trust-red' }, // North America (West)
-    { id: 2, top: '28%', left: '48%', color: 'shadow-[0_0_15px_rgba(245,158,11,0.8)] bg-trust-yellow' }, // Europe (Central)
-    { id: 3, top: '42%', left: '72%', color: 'shadow-[0_0_15px_rgba(239,68,68,0.8)] bg-trust-red' }, // Asia (East)
-    { id: 4, top: '65%', left: '29%', color: 'shadow-[0_0_15px_rgba(59,130,246,0.8)] bg-guardian-blue' }, // South America
-    { id: 5, top: '75%', left: '82%', color: 'shadow-[0_0_15px_rgba(168,85,247,0.8)] bg-purple-500' }, // Australia
-  ];
+  // Initialize with data immediately to prevent "empty" flash
+  const [agentsList, setAgentsList] = useState([
+    { name: "Support_Agent_01", id: "did:ion:EiD...429", trust: 98, category: "Customer Service" },
+    { name: "Bank_Verifier_X", id: "did:web:bank.chase.com...", trust: 95, category: "Finance" },
+    { name: "Global_Auth_Node_4", id: "did:web:auth.global.net...", trust: 99, category: "Infrastructure" },
+    { name: "Legal_Verifier_NY", id: "did:ion:legal.ny.gov...", trust: 92, category: "Legal" }
+  ]);
 
-  // --- FETCH AGENTS ---
+  const [stats, setStats] = useState({ threats: 14205, nodes: 843 });
+  const [mapBlips, setMapBlips] = useState([
+    { id: 1, top: '35%', left: '22%', color: 'shadow-[0_0_15px_rgba(239,68,68,0.8)] bg-trust-red' },
+    { id: 2, top: '28%', left: '48%', color: 'shadow-[0_0_15px_rgba(245,158,11,0.8)] bg-trust-yellow' },
+    { id: 3, top: '42%', left: '72%', color: 'shadow-[0_0_15px_rgba(239,68,68,0.8)] bg-trust-red' },
+    { id: 4, top: '65%', left: '29%', color: 'shadow-[0_0_15px_rgba(59,130,246,0.8)] bg-guardian-blue' },
+    { id: 5, top: '75%', left: '82%', color: 'shadow-[0_0_15px_rgba(168,85,247,0.8)] bg-purple-500' },
+  ]);
+
+  // --- LIVE STATS SIMULATION ---
   useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const res = await fetch(`${API_URL}/handshake/agents`);
-        if (res.ok) setAgentsList(await res.json());
-      } catch (e) {
-        setAgentsList([
-          { name: "Support_Agent_01", id: "did:ion:123...", trust: 98, category: "Customer Service" },
-          { name: "Bank_Verifier_X", id: "did:web:bank...", trust: 95, category: "Finance" }
-        ]);
-      }
-    }
-    fetchAgents();
+    const interval = setInterval(() => {
+      setStats(prev => ({
+        threats: prev.threats + Math.floor(Math.random() * 3), // Increment threats randomly
+        nodes: prev.nodes + (Math.random() > 0.8 ? 1 : 0) // Occasionally add a node
+      }));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- LIVE MAP SIMULATION ---
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Randomly move blips slightly or toggle visibility to simulate activity
+      setMapBlips(prev => prev.map(blip => ({
+        ...blip,
+        scale: 0.8 + Math.random() * 0.4, // Pulsing effect
+        opacity: 0.5 + Math.random() * 0.5
+      })));
+    }, 1500);
+    return () => clearInterval(interval);
   }, []);
 
   // --- NEWS VERIFICATION HANDLER ---
@@ -61,40 +75,25 @@ export default function Dashboard({ onBack }) {
     setAnalyzingNews(true);
     setNewsResult(null);
 
-    try {
-      const response = await fetch(`${API_URL}/verify-news`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: newsUrl })
+    // Guaranteed Mock Result Sequence for Demo Stability
+    setTimeout(() => {
+      const isFake = newsUrl.toLowerCase().includes("fake") || newsUrl.includes("rumor");
+      setNewsResult({
+        trust_score: isFake ? 12 : 99,
+        publisher: isFake ? "Unknown Source" : "Verified Publisher (NYT)",
+        c2pa_valid: !isFake,
+        metadata: { timestamp: new Date().toISOString() }
       });
-      if (!response.ok) throw new Error("Backend offline");
-      const data = await response.json();
-      setNewsResult(data);
-    } catch (e) {
-      console.error("Verification error:", e);
-      // Fallback Mock for Demo if Backend fails
-      setTimeout(() => {
-        const isFake = newsUrl.toLowerCase().includes("fake");
-        setNewsResult({
-          trust_score: isFake ? 12 : 99,
-          publisher: isFake ? "Unknown Source" : "Verified Publisher",
-          c2pa_valid: !isFake,
-          metadata: { timestamp: new Date().toISOString() }
-        });
-      }, 1000);
-    } finally {
-      setTimeout(() => setAnalyzingNews(false), 1000);
-    }
+      setAnalyzingNews(false);
+    }, 2000); // 2s analysis simulation
   }
 
   // --- DASHBOARD ACTIONS ---
   const handleViewAllRegistry = () => {
-    // Mock expansion
     setAgentsList(prev => [
       ...prev,
-      { name: "Global_Auth_Node_4", id: "did:web:auth.global...", trust: 99, category: "Infrastructure" },
-      { name: "Legal_Verifier_NY", id: "did:ion:legal.ny...", trust: 92, category: "Legal" },
-      { name: "Medical_Data_Bridge", id: "did:web:med.bridge...", trust: 97, category: "Healthcare" }
+      { name: "Medical_Data_Bridge", id: "did:web:med.bridge...", trust: 97, category: "Healthcare" },
+      { name: "Gov_Services_Portal", id: "did:gov:usa.portal...", trust: 99, category: "Government" }
     ]);
   };
 
@@ -163,7 +162,7 @@ export default function Dashboard({ onBack }) {
             <GlassCard className="preserve-3d tilt-card hover:rotate-x-12 hover:rotate-y-12">
               <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity"><Shield className="w-32 h-32" /></div>
               <div className="text-gray-400 text-xs font-mono mb-1 uppercase tracking-wider">Threats Repelled</div>
-              <div className="text-5xl font-bold text-white tracking-tighter text-glow-blue">{threatsBlocked.toLocaleString()}</div>
+              <div className="text-5xl font-bold text-white tracking-tighter text-glow-blue">{stats.threats.toLocaleString()}</div>
               <div className="flex items-center gap-2 mt-4 text-xs font-bold text-trust-green">
                 <Activity className="w-3 h-3" /> +12.4% Efficiency
               </div>
@@ -172,7 +171,7 @@ export default function Dashboard({ onBack }) {
             <GlassCard className="hover:border-guardian-blue/30">
               <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity"><Cpu className="w-32 h-32" /></div>
               <div className="text-gray-400 text-xs font-mono mb-1 uppercase tracking-wider">Active Guardians</div>
-              <div className="text-5xl font-bold text-white tracking-tighter">{activeNodes}</div>
+              <div className="text-5xl font-bold text-white tracking-tighter">{stats.nodes.toLocaleString()}</div>
               <div className="flex items-center gap-2 mt-4 text-xs font-bold text-guardian-blue">
                 <Zap className="w-3 h-3" /> All Systems Online
               </div>
@@ -190,21 +189,38 @@ export default function Dashboard({ onBack }) {
               <p className="text-xs text-white/40 font-mono mt-1">REAL-TIME GLOBAL TELEMETRY</p>
             </div>
 
-            {/* Animated Blips */}
-            {blips.map((blip) => (
+            {/* Animated Blips & Federated Connections */}
+            {mapBlips.map((blip) => (
               <div key={blip.id}
-                className="absolute group cursor-pointer"
-                style={{ top: blip.top, left: blip.left }}
-                onClick={() => handleBlipClick(blip.id)}>
+                className="absolute group cursor-pointer transition-all duration-1000 ease-in-out"
+                style={{
+                  top: blip.top,
+                  left: blip.left,
+                  transform: `scale(${blip.scale || 1})`,
+                  opacity: blip.opacity || 1
+                }}>
+
+                {/* Visual Connection Line (Simulating Network) */}
+                <div className="absolute top-1.5 left-1.5 w-[200px] h-[1px] bg-gradient-to-r from-guardian-blue/50 to-transparent origin-left animate-pulse-fast opacity-0 group-hover:opacity-100 rotate-45 pointer-events-none"></div>
+
                 <div className={`w-3 h-3 rounded-full ${blip.color} animate-ping absolute opacity-50`}></div>
                 <div className={`w-3 h-3 rounded-full ${blip.color} relative shadow-[0_0_10px_currentColor] transition-transform group-hover:scale-150`}></div>
 
                 {/* Tooltip */}
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-guardian-dark border border-white/20 px-3 py-1 rounded text-[10px] whitespace-nowrap z-20 pointer-events-none text-white shadow-xl">
-                  INTERCEPTED ID: #{Math.floor(Math.random() * 9999)}
+                  <div className="font-bold mb-0.5">FEDERATED NODE #{blip.id}</div>
+                  <div className="text-gray-400 text-[9px] flex items-center gap-1">
+                    <Activity className="w-2 h-2 text-trust-green" /> MESH ACTIVE
+                  </div>
                 </div>
               </div>
             ))}
+
+            {/* Level 4: Global Federated Pulse Overlay */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-guardian-blue/10 rounded-full animate-ping-slow opacity-20"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] border border-guardian-blue/20 rounded-full animate-ping-slower opacity-30"></div>
+            </div>
           </GlassCard>
         </div>
 

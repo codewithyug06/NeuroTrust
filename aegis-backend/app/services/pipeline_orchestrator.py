@@ -118,7 +118,18 @@ class PipelineOrchestrator:
                 "identity": human_id_res,
                 "authenticity": auth_res,
                 "fusion_intent": fusion_res,
-                "security": security_res
+                "security": security_res,
+                
+                # --- LEVEL 1 & 2 ADVANCEMENTS SIMULATION ---
+                "ai_confidence": 0.94 if trust_res['score'] > 80 else 0.88,
+                "intent_drift": {
+                    "status": "STABLE" if trust_res['score'] > 60 else "DRIFTING",
+                    "trend": "FLAT" if trust_res['score'] > 60 else "RISING",
+                    "history": [0.1, 0.12, 0.15, 0.15, 0.2] # Mock history
+                },
+                "psychological_triggers": [
+                    {"type": "URGENCY", "confidence": 0.85, "description": "High pressure detected"}
+                ] if trust_res['score'] < 50 else []
             },
             "layer_14_trace": trace_log
         }

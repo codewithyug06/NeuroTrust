@@ -125,13 +125,59 @@ class MockAIService:
 
         if is_safe:
             return {
-                "trust_score": 99,
+            # Placeholder for variables that would be calculated in a real system
+            # For this mock, we'll use fixed values or simple derivations
+            intent_score = random.uniform(0.05, 0.3) # Low risk for safe content
+            frame_count = 100 # Arbitrary for mock
+            trust_score = 99 # From the existing return
+            
+            # Enhanced Mock Response with Level 1 & 2 Advancements
+            
+            # 1. Intent Drift Calculation (Simulated Trajectory)
+            drift_status = "STABLE"
+            drift_trend = "FLAT"
+            if intent_score > 0.7:
+                 drift_status = "RAPID_SHIFT"
+                 drift_trend = "ESCALATING"
+            elif intent_score > 0.4:
+                 drift_status = "DRIFTING"
+                 drift_trend = "RISING"
+
+            # 2. Psychological Manipulation Detection
+            psych_triggers = []
+            if frame_count % 30 == 0: # Occasional triggers
+                 import random
+                 triggers = [
+                     {"type": "URGENCY", "confidence": 0.88, "description": "High pressure time constraint detected"},
+                     {"type": "AUTHORITY", "confidence": 0.75, "description": "Impersonating authoritative tone"},
+                     {"type": "FEAR", "confidence": 0.92, "description": "Threat of consequence detected"},
+                     {"type": "GUILT", "confidence": 0.65, "description": "Social engineering via guilt tripping"}
+                 ]
+                 if intent_score > 0.5:
+                     psych_triggers = random.sample(triggers, k=random.randint(1, 2))
+
+            # 3. AI Confidence Model
+            # High trust = High confidence. Low trust (deepfake) = High confidence. Middle = Low confidence.
+            ai_confidence = 0.85 + (abs(trust_score - 50) / 200) # Simple curve
+            ai_confidence = min(0.99, max(0.70, ai_confidence))
+
+            return {
+                "trust_score": trust_score,
                 "publisher": "Associated Press (AP)",
                 "c2pa_valid": True,
                 "ai_generated_prob": 1,
                 "metadata": {
                     "signed_by": "did:web:ap.org",
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": datetime.utcnow().isoformat(),
+                    # New Advanced Fields
+                    "ai_confidence": ai_confidence,
+                    "intent_drift": {
+                        "status": drift_status,
+                        "trend": drift_trend,
+                        "history": [0.1, 0.2, 0.2, 0.3, intent_score] # Mock history
+                    },
+                    "psychological_triggers": psych_triggers,
+                    "adaptive_trust_threshold": 75.5 # Example of personalized threshold
                 }
             }
         else:
@@ -144,3 +190,4 @@ class MockAIService:
                     "error": "Signature Missing"
                 }
             }
+```

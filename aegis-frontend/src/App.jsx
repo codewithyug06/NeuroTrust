@@ -143,6 +143,7 @@ export default function App() {
     const triggerIncomingCall = (safeMode) => {
         setIsSafeMode(safeMode);
         setCallStatus("RINGING");
+        setWalletConnected(true); // Auto-connect wallet for smooth demo flow
         setAgentName(safeMode ? "Bank of America Support" : "Unknown Number");
         setMemoryRecall(null);
         setGraphContext(null);
@@ -196,15 +197,21 @@ export default function App() {
                 // BACKEND CALL - WITH FALLBACK
                 let data;
                 try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s Timeout
+
                     const response = await fetch(`${API_URL}/analyze-stream`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ scenario: isSafeMode ? "SAFE" : "DEEPFAKE" })
+                        body: JSON.stringify({ scenario: isSafeMode ? "SAFE" : "DEEPFAKE" }),
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
+
                     if (!response.ok) throw new Error("Backend offline");
                     data = await response.json();
                 } catch (e) {
-                    console.warn("Backend unavailable, using mock data for demo.");
+                    console.warn("Backend unavailable/timed out, using mock data for demo.", e);
                     data = isSafeMode ? {
                         mood_score: 98,
                         biometrics: { blink_rate: 18, head_yaw: 2 },
@@ -228,9 +235,13 @@ export default function App() {
                 if (data.biometrics) setBiometrics(data.biometrics);
                 if (data.device_fingerprint?.model) setDeviceFingerprint(data.device_fingerprint.model);
 
-                // NEW: Capture Trace & Details
-                if (data.pipeline_trace) setPipelineTrace(data.pipeline_trace);
-                if (data.details) setLayerDetails(data.details);
+                // NEW: Capture Trace & Details (With Robust Fallbacks)
+                setPipelineTrace(data.pipeline_trace || ["System Analysis Complete", "Trace Log Unavailable"]);
+                setLayerDetails(data.details || {
+                    reason: "Data Unavailable",
+                    psychological_triggers: [],
+                    intent_drift: { status: "UNKNOWN", trend: "FLAT" }
+                });
 
                 setTrustScore(data.safety_score);
 
@@ -295,8 +306,8 @@ export default function App() {
 
                                 <div className="flex items-center justify-between mb-6 bg-white/5 p-4 rounded-xl border border-white/5">
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-white">Elderly Mode</span>
-                                        <span className="text-[10px] text-gray-400">Simplified Interface</span>
+                                        <span className="text-sm font-bold text-white">Cognitive Safety Mode</span>
+                                        <span className="text-[10px] text-gray-400">Reduced Load Interface</span>
                                     </div>
                                     <button
                                         onClick={() => setElderlyMode(!elderlyMode)}
@@ -427,6 +438,15 @@ export default function App() {
                             <button onClick={() => setShowQrScan(false)} className="mt-4 text-gray-500 text-xs">Cancel</button>
                         </div>
                     )}
+
+                    {/* PREVIEW MODE / DEBUG OVERLAY */}
+                    <div className="absolute top-2 left-2 z-50 pointer-events-none opacity-50">
+                        <div className="bg-black/50 p-2 rounded text-[8px] font-mono text-green-400">
+                            <div>STATUS: {callStatus}</div>
+                            <div>WALLET: {walletConnected ? 'CONNECTED' : 'DISCONNECTED'}</div>
+                            <div>SAFE_MODE: {isSafeMode ? 'TRUE' : 'FALSE'}</div>
+                        </div>
+                    </div>
                 </PhoneInterface>
             )}
         </>
