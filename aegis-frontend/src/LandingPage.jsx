@@ -1,170 +1,204 @@
-import { Shield, ArrowRight, Play, AlertTriangle, Users, Lock, CheckCircle, Activity, Smartphone } from 'lucide-react';
-import NeuralBackground from './components/NeuralBackground';
+import React, { useState, useEffect } from 'react';
+import { Shield, Lock, Activity, ArrowRight, Play, Users, Bot, Building2, CheckCircle, Fingerprint } from 'lucide-react';
+import GlassCard from './components/ui/GlassCard';
+import CyberButton from './components/ui/CyberButton';
+import StatusBadge from './components/ui/StatusBadge';
 
-export default function LandingPage({ onLaunchDemo, onLaunchDashboard }) {
+export default function LandingPage({ onEnterApp, onDemoStart }) {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
-        <div className="min-h-screen w-full bg-guardian-dark text-white font-sans selection:bg-trust-green selection:text-white overflow-x-hidden relative">
+        <div className="min-h-screen bg-black text-white selection:bg-trust-green/30 font-sans overflow-x-hidden">
 
-            {/* Background Ambience */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-guardian-blue/10 via-guardian-dark to-guardian-dark pointer-events-none"></div>
-            <NeuralBackground />
+            {/* NAVBAR */}
+            <nav className={`fixed top-12 w-full z-40 transition-all duration-500 ease-in-out ${scrolled ? 'bg-black/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-2xl' : 'bg-gradient-to-b from-black/80 to-transparent py-8'}`}>
+                <div className="max-w-[1400px] mx-auto px-8 grid grid-cols-12 items-center h-full">
 
-            {/* Navigation */}
-            <nav className="relative z-50 w-full px-6 py-6 pt-16 flex items-center justify-between container mx-auto">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-trust-green rounded-lg flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-guardian-dark" />
+                    {/* LEFT: LOGO */}
+                    <div className="col-span-3 flex items-center gap-4 group cursor-pointer">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-trust-green/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <Shield className="w-10 h-10 text-trust-green relative z-10" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-2xl font-black tracking-tighter text-white leading-none group-hover:text-gray-100 transition-colors">
+                                NeuroTrust
+                            </span>
+                            <span className="text-[10px] font-mono font-bold text-trust-green/60 uppercase tracking-[0.2em] group-hover:text-trust-green transition-colors">
+                                Zero Trust Perception
+                            </span>
+                        </div>
                     </div>
-                    <span className="font-bold text-xl tracking-wide">NeuroTrust</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <button className="text-sm text-gray-400 hover:text-white transition-colors">How it Works</button>
-                    <button className="text-sm text-gray-400 hover:text-white transition-colors">For Enterprise</button>
-                    <button onClick={onLaunchDashboard} className="text-sm text-trust-green hover:text-green-400 transition-colors">Dashboard</button>
+
+                    {/* CENTER: NAV LINKS */}
+                    <div className="col-span-6 hidden md:flex items-center justify-center gap-12">
+                        {['How it Works', 'Use Cases', 'Trust Center'].map((item) => (
+                            <a
+                                key={item}
+                                href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+                                className="text-sm font-bold text-gray-400 hover:text-white uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
+                            >
+                                {item}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* RIGHT: ACTIONS */}
+                    <div className="col-span-3 flex items-center justify-end gap-6">
+                        <button
+                            onClick={() => onEnterApp('LOGIN')}
+                            className="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-widest transition-colors"
+                        >
+                            Sign In
+                        </button>
+                        <CyberButton onClick={() => onEnterApp('DASHBOARD')} className="!px-8 !py-3">
+                            <span className="flex items-center gap-2 font-bold tracking-wide">
+                                GET PROTECTED <ArrowRight className="w-4 h-4" />
+                            </span>
+                        </CyberButton>
+                    </div>
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <div className="relative z-10 container mx-auto px-6 pt-16 pb-20 flex flex-col items-center text-center">
+            {/* HERO SECTION */}
+            <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+                {/* Background FX */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-guardian-blue/20 via-black to-black opacity-40"></div>
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
 
-                {/* Trust signal badge */}
-                <div className="mb-6 px-4 py-1.5 rounded-full bg-trust-green/10 border border-trust-green/20 flex items-center gap-2 animate-fade-in-up">
-                    <div className="w-2 h-2 rounded-full bg-trust-green animate-pulse"></div>
-                    <span className="text-trust-green text-xs font-bold tracking-widest uppercase">Global Trust Network Active</span>
+                <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-trust-green mb-8 animate-fade-in-up">
+                        <span className="w-2 h-2 rounded-full bg-trust-green animate-pulse"></span>
+                        SYSTEM ONLINE • PROTECTING 24M+ IDENTITIES
+                    </div>
+
+                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-none animate-fade-in-up delay-100">
+                        Verify reality <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">before it reaches you.</span>
+                    </h1>
+
+                    <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-in-up delay-200">
+                        The first AI-native defense grid against deepfakes, voice cloning, and autonomous agent fraud.
+                        <span className="text-white font-bold"> Zero Trust Perception</span> for the post-truth era.
+                    </p>
+
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 animate-fade-in-up delay-300">
+                        <button onClick={() => onEnterApp('DASHBOARD')} className="px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.3)] flex items-center gap-3">
+                            <Shield className="w-5 h-5" /> Start Protection
+                        </button>
+                        <button onClick={onDemoStart} className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold text-lg rounded-full hover:bg-white/10 transition-colors backdrop-blur-md flex items-center gap-3">
+                            <Play className="w-5 h-5 fill-white" /> Live Demo
+                        </button>
+                    </div>
                 </div>
+            </section>
 
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 animate-fade-in-up delay-100 max-w-4xl leading-tight glitch-text" data-text="Verify reality">
-                    Verify reality<br />
-                    <span className="text-white">before it reaches you.</span>
-                </h1>
+            {/* HOW IT WORKS */}
+            <section id="features" className="py-32 relative border-t border-white/5 bg-guardian-dark">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-20">
+                        <h2 className="text-4xl md:text-5xl font-black mb-6">Defense in Depth</h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto">We don't just check phone numbers. We analyze the physics of sound and light to separate human from synthetic.</p>
+                    </div>
 
-                <p className="text-gray-400 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-fade-in-up delay-200">
-                    The invisible guardian against deepfakes, voice clones, and agentic fraud.
-                    NeuroTrust validates the authenticity of every digital interaction in real-time.
-                </p>
-
-                <div className="flex flex-col md:flex-row gap-4 w-full max-w-md animate-fade-in-up delay-300 relative">
-                    {/* Scanning Beam Effect */}
-                    <div className="absolute -inset-10 bg-scan-beam mix-blend-overlay opacity-20 pointer-events-none animate-scan-beam mask-linear-fade"></div>
-
-                    <button
-                        onClick={onLaunchDemo}
-                        className="group flex-1 py-4 px-8 bg-trust-green hover:bg-green-400 text-guardian-dark font-bold rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.3)] relative overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-shimmer"></div>
-                        <Play className="w-5 h-5 fill-current" />
-                        <span>Launch Demo</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
-
-                    <button
-                        onClick={onLaunchDashboard}
-                        className="group flex-1 py-4 px-8 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl border border-white/10 transition-all flex items-center justify-center gap-3 backdrop-blur-sm"
-                    >
-                        <Activity className="w-5 h-5 text-trust-red" />
-                        <span>Live Threat Map</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Hero Visual - Simulated Incoming Threat */}
-            <div className="relative z-10 container mx-auto px-6 pb-32 animate-fade-in-up delay-500">
-                <div className="relative max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-guardian-slate/50 backdrop-blur-xl">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-trust-green via-trust-yellow to-trust-red"></div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2">
-                        {/* Left: Enhanced Reality */}
-                        <div className="p-8 border-r border-white/5 flex flex-col justify-center">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-full bg-guardian-blue/20 flex items-center justify-center">
-                                    <Shield className="w-5 h-5 text-guardian-blue" />
-                                </div>
-                                <div>
-                                    <div className="text-sm font-bold text-white">Guardian Core</div>
-                                    <div className="text-xs text-gray-500">Real-time Analysis</div>
-                                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-guardian-blue/50 transition-colors group">
+                            <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <Fingerprint className="w-8 h-8 text-trust-green" />
                             </div>
-
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                                    <span className="text-sm text-green-400 font-medium">Platform Integrity</span>
-                                    <CheckCircle className="w-4 h-4 text-green-400" />
-                                </div>
-                                <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                                    <span className="text-sm text-yellow-400 font-medium">Voice Clone Detected</span>
-                                    <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                                </div>
-                                <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                                    <span className="text-sm text-red-400 font-medium">Scam Pattern Match</span>
-                                    <span className="text-xs font-bold text-red-400 bg-red-500/20 px-2 py-1 rounded">BLOCKED</span>
-                                </div>
-                            </div>
+                            <h3 className="text-2xl font-bold mb-4">1. Identity Check</h3>
+                            <p className="text-gray-400 leading-relaxed">Cryptographic verification of caller ID using Decentralized Identifiers (DIDs). We know *who* is calling before you pick up.</p>
                         </div>
-
-                        {/* Right: User View */}
-                        <div className="relative h-64 md:h-auto bg-black">
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
-                                <div className="w-20 h-20 rounded-full bg-gray-800 mb-4 border-2 border-red-500 animate-pulse overflow-hidden relative">
-                                    <div className="absolute inset-0 bg-red-500/20"></div>
-                                    <Users className="w-full h-full p-4 text-gray-500" />
-                                </div>
-                                <h3 className="text-xl font-bold text-red-500 mb-1">Unknown Caller</h3>
-                                <p className="text-xs text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-900">High Risk • Financial Scam</p>
+                        <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-guardian-blue/50 transition-colors group">
+                            <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <Activity className="w-8 h-8 text-blue-400" />
                             </div>
-
-                            {/* Overlay */}
-                            <div className="absolute inset-0 border-4 border-red-500 pointer-events-none opacity-50 animate-pulse"></div>
+                            <h3 className="text-2xl font-bold mb-4">2. Reality Verification</h3>
+                            <p className="text-gray-400 leading-relaxed">Real-time spectral analysis detects synthetic voice artifacts and lip-sync inconsistencies invisible to the human ear.</p>
+                        </div>
+                        <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-guardian-blue/50 transition-colors group">
+                            <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <Lock className="w-8 h-8 text-amber-500" />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-4">3. Guardian Intercept</h3>
+                            <p className="text-gray-400 leading-relaxed">If trust is low, our AI Guardian steps in. It interrogates the caller, protecting you from coercion and scams.</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Feature Sections */}
-            <div className="bg-guardian-slate/50 border-t border-white/5 py-24 relative z-10">
-                <div className="container mx-auto px-6">
+            {/* USE CASES */}
+            <section id="use-cases" className="py-32 relative bg-black">
+                <div className="max-w-7xl mx-auto px-6">
+                    <h2 className="text-4xl font-black mb-16 text-center">Protection for Every Layer of Society</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        {/* Feature 1 */}
-                        <div className="group">
-                            <div className="w-12 h-12 bg-guardian-blue/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Users className="w-6 h-6 text-guardian-blue" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <GlassCard className="p-10 flex flex-col justify-between min-h-[300px] cursor-pointer hover:bg-white/5 transition-colors" onClick={() => onEnterApp('FAMILY')}>
+                            <div>
+                                <Users className="w-10 h-10 text-pink-500 mb-6" />
+                                <h3 className="text-3xl font-bold mb-2">Families & Elderly</h3>
+                                <p className="text-gray-400">Simplified implementation for vulnerable loved ones. Auto-blocking and guardian intervention.</p>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-3">Who It Protects</h3>
-                            <p className="text-gray-400 leading-relaxed text-sm">
-                                Designed for the elderly, families, and high-value targets. NeuroTrust acts as a digital bodyguard that never sleeps.
-                            </p>
-                        </div>
-
-                        {/* Feature 2 */}
-                        <div className="group">
-                            <div className="w-12 h-12 bg-trust-green/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Shield className="w-6 h-6 text-trust-green" />
+                            <div className="flex items-center gap-2 text-pink-500 mt-8 font-bold">
+                                EXPLORE FAMILY DASHBOARD <ArrowRight className="w-4 h-4" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-3">How It Works</h3>
-                            <p className="text-gray-400 leading-relaxed text-sm">
-                                Multi-modal analysis inspects audio waveforms and video pixels for generational artifacts, verifying reality instantly.
-                            </p>
-                        </div>
+                        </GlassCard>
 
-                        {/* Feature 3 */}
-                        <div className="group">
-                            <div className="w-12 h-12 bg-trust-yellow/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                                <Lock className="w-6 h-6 text-trust-yellow" />
+                        <GlassCard className="p-10 flex flex-col justify-between min-h-[300px] cursor-pointer hover:bg-white/5 transition-colors" onClick={() => onEnterApp('ENTERPRISE')}>
+                            <div>
+                                <Building2 className="w-10 h-10 text-amber-500 mb-6" />
+                                <h3 className="text-3xl font-bold mb-2">Enterprise & Leaders</h3>
+                                <p className="text-gray-400">Protect executives from high-stakes impersonation and secure corporate AI agents.</p>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-3">Privacy First</h3>
-                            <p className="text-gray-400 leading-relaxed text-sm">
-                                Your conversations never leave your device. Analysis happens locally or via secure, anonymized enclaves.
-                            </p>
+                            <div className="flex items-center gap-2 text-amber-500 mt-8 font-bold">
+                                VIEW ENTERPRISE SUITE <ArrowRight className="w-4 h-4" />
+                            </div>
+                        </GlassCard>
+
+                        <GlassCard className="p-10 flex flex-col justify-between min-h-[300px] cursor-pointer hover:bg-white/5 transition-colors md:col-span-2" onClick={() => onEnterApp('AGENTS')}>
+                            <div className="relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                                <Bot className="w-10 h-10 text-cyan-500 mb-6 relative z-10" />
+                                <h3 className="text-3xl font-bold mb-2 relative z-10">The AI Agent Economy</h3>
+                                <p className="text-gray-400 max-w-xl relative z-10">As AI agents begin to act on your behalf, verify their identity and intent. Maintain oversight of your digital delegates.</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-cyan-500 mt-8 font-bold">
+                                MANAGE AGENT TRUST <ArrowRight className="w-4 h-4" />
+                            </div>
+                        </GlassCard>
+                    </div>
+                </div>
+            </section>
+
+            {/* FOOTER */}
+            <footer className="py-20 border-t border-white/5 bg-guardian-dark">
+                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+                    <div className="col-span-1 md:col-span-2">
+                        <div className="flex items-center gap-3 mb-6">
+                            <Shield className="w-6 h-6 text-trust-green" />
+                            <div className="text-xl font-bold">NeuroTrust</div>
                         </div>
+                        <p className="text-gray-500 max-w-sm mb-6">Pioneering Zero Trust Perception for a safer digital future.</p>
+                        <div className="text-xs text-gray-600">© 2026 NeuroTrust Inc. All rights reserved.</div>
                     </div>
 
+                    <div>
+                        <h4 className="font-bold mb-6">Platform</h4>
+                        <ul className="space-y-4 text-sm text-gray-400">
+                            <li><button onClick={() => onEnterApp('DASHBOARD')} className="hover:text-white">Personal Dashboard</button></li>
+                            <li><button onClick={() => onEnterApp('FAMILY')} className="hover:text-white">Family Safety</button></li>
+                            <li><button onClick={() => onEnterApp('ENTERPRISE')} className="hover:text-white">Enterprise</button></li>
+                            <li><button onClick={() => onEnterApp('SETTINGS')} className="hover:text-white">Privacy Policy</button></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className="w-full py-8 text-center border-t border-white/5 text-gray-600 text-xs font-mono">
-                <p>NeuroTrust PROTOCOL • IMAGINE CUP 2026</p>
-            </div>
+            </footer>
 
         </div>
     );

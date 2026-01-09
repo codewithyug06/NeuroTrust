@@ -11,6 +11,11 @@ import GuardianPresence from './components/GuardianPresence';
 import Onboarding from './components/Onboarding';
 import { Settings as Config } from './core/config';
 
+import FamilyDashboard from './components/FamilyDashboard';
+import AgentDashboard from './components/AgentDashboard';
+import EnterpriseDashboard from './components/EnterpriseDashboard';
+import SettingsDashboard from './components/SettingsDashboard';
+
 // --- BACKEND API URL ---
 const API_URL = `http://127.0.0.1:8000/api/v1`;
 
@@ -279,16 +284,22 @@ export default function App() {
             {/* ROUTING */}
             {view === "DASHBOARD" && <Dashboard onBack={() => setView("LANDING")} />}
 
+            {view === "FAMILY" && <FamilyDashboard onBack={() => setView("LANDING")} />}
+            {view === "AGENTS" && <AgentDashboard onBack={() => setView("LANDING")} />}
+            {view === "ENTERPRISE" && <EnterpriseDashboard onBack={() => setView("LANDING")} />}
+            {view === "SETTINGS" && <SettingsDashboard onBack={() => setView("LANDING")} />}
+
             {view === "LANDING" && (
                 <LandingPage
-                    onLaunchDemo={() => setView("ONBOARDING")}
-                    onLaunchDashboard={() => setView("DASHBOARD")}
+                    onEnterApp={(dest) => setView(dest === 'LOGIN' ? 'DASHBOARD' : dest)}
+                    onDemoStart={() => setView("ONBOARDING")}
                 />
             )}
 
             {view === "ONBOARDING" && (
                 <Onboarding onComplete={() => setView("PHONE")} />
             )}
+
 
             {/* PHONE UI */}
             {view === "PHONE" && (
