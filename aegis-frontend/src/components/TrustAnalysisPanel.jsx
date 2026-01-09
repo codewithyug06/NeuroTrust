@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Activity, Lock, Users, AlertTriangle, CheckCircle, Mic, Video, Brain, Fingerprint, Terminal, List } from 'lucide-react';
+import GlassCard from './ui/GlassCard';
 
 export default function TrustAnalysisPanel({ data }) {
     if (!data) return null;
@@ -36,9 +37,11 @@ export default function TrustAnalysisPanel({ data }) {
             </div>
 
             {/* MAIN TRUST CARD */}
-            <div className={`glass-panel p-4 rounded-2xl border-l-4 mb-4 backdrop-blur-xl transition-colors duration-500
+            <GlassCard
+                hoverEffect={false}
+                className={`p-4 rounded-2xl border-l-4 mb-4 backdrop-blur-xl transition-colors duration-500
                 ${level === 'TRUSTED' ? 'border-l-green-500 bg-black/80' :
-                    level === 'BLOCKED' ? 'border-l-red-500 bg-red-950/90' : 'border-l-yellow-500 bg-black/80'}`}>
+                        level === 'BLOCKED' ? 'border-l-red-500 bg-red-950/90' : 'border-l-yellow-500 bg-black/80'}`}>
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-4">
@@ -119,11 +122,11 @@ export default function TrustAnalysisPanel({ data }) {
                         </div>
                     </div>
                 )}
-            </div>
+            </GlassCard>
 
             {/* GUARDIAN MESSAGE */}
             {isBlocked && (
-                <div className="glass-panel bg-red-600/20 border border-red-500/50 p-3 rounded-xl animate-bounce-in shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+                <GlassCard hoverEffect={false} className="bg-red-600/20 border-red-500/50 p-3 rounded-xl animate-bounce-in shadow-[0_0_30px_rgba(239,68,68,0.3)]">
                     <div className="flex items-start gap-3">
                         <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
                         <div>
@@ -133,7 +136,7 @@ export default function TrustAnalysisPanel({ data }) {
                             </p>
                         </div>
                     </div>
-                </div>
+                </GlassCard>
             )}
         </div>
     );

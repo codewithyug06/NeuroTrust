@@ -130,8 +130,9 @@ export default function CallScreen({
 
                 {/* --- GUARDIAN INTERVENTION (SCENARIO B) --- */}
                 {isIntervention && (
-                    <div className="absolute inset-0 bg-red-600 z-50 flex flex-col items-center justify-center p-6 text-center pointer-events-auto">
+                    <div className="absolute inset-0 bg-red-600 z-50 flex flex-col items-center justify-center p-6 text-center pointer-events-auto animate-fade-in">
                         <div className="w-full h-full absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+                        <div className="absolute inset-0 border-[20px] border-red-900/50 animate-pulse-glow pointer-events-none"></div>
 
                         {elderlyMode ? (
                             // ELDERLY MODE: SIMPLE REASSURANCE

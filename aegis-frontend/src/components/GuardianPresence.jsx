@@ -1,68 +1,95 @@
 import React from 'react';
+import { Shield, Eye, AlertTriangle, ShieldAlert } from 'lucide-react';
 
 const GuardianPresence = ({ state = 'monitoring' }) => {
     // State: 'monitoring' | 'investigating' | 'intervening'
 
-    const getStateStyles = () => {
+    const getStatusConfig = () => {
         switch (state) {
             case 'investigating':
-                return 'border-trust-yellow shadow-[0_0_15px_rgba(245,158,11,0.5)] animate-pulse-fast';
+                return {
+                    text: 'ANALYZING THREAT...',
+                    color: 'text-trust-yellow',
+                    borderColor: 'border-trust-yellow',
+                    shadow: 'shadow-[0_0_20px_rgba(245,158,11,0.4)]',
+                    icon: AlertTriangle,
+                    bg: 'bg-trust-yellow/10',
+                    animation: 'animate-pulse'
+                };
             case 'intervening':
-                return 'border-trust-red shadow-[0_0_25px_rgba(239,68,68,0.8)] animate-pulse';
+                return {
+                    text: 'THREAT BLOCKED',
+                    color: 'text-trust-red',
+                    borderColor: 'border-trust-red',
+                    shadow: 'shadow-[0_0_30px_rgba(239,68,68,0.6)]',
+                    icon: ShieldAlert,
+                    bg: 'bg-trust-red/20',
+                    animation: 'animate-pulse'
+                };
             case 'monitoring':
             default:
-                return 'border-trust-green shadow-[0_0_10px_rgba(16,185,129,0.3)]';
+                return {
+                    text: 'GUARDIAN ACTIVE',
+                    color: 'text-trust-green',
+                    borderColor: 'border-trust-green',
+                    shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.2)]',
+                    icon: Eye,
+                    bg: 'bg-trust-green/10',
+                    animation: ''
+                };
         }
     };
 
-    const getStatusText = () => {
-        switch (state) {
-            case 'investigating': return 'Analyzing...';
-            case 'intervening': return 'BLOCKING';
-            default: return 'Guardian Active';
-        }
-    };
+    const config = getStatusConfig();
+    const Icon = config.icon;
 
     return (
-        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3 select-none pointer-events-none">
-            <div className={`text-xs font-mono font-medium tracking-wider text-white/80 transition-opacity duration-300 ${state === 'monitoring' ? 'opacity-50' : 'opacity-100'}`}>
-                {getStatusText()}
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-4 transition-all duration-500 ${state === 'intervening' ? 'scale-110' : 'scale-100'}`}>
+
+            {/* Context Label (Only shows when not idle monitoring for cleaner look, or always show if preferred) */}
+            <div className={`
+                px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/10 bg-black/60
+                text-[10px] font-mono font-bold tracking-[0.2em] uppercase
+                transition-all duration-300
+                ${config.color}
+                ${state === 'monitoring' ? 'opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0' : 'opacity-100 translate-x-0'}
+            `}>
+                {config.text}
             </div>
 
-            <div className="relative">
-                {/* Core Avatar */}
-                <GuardianAvatar state={state} />
+            <div className="relative group cursor-default">
+                {/* Outer Glow Ring */}
+                <div className={`absolute inset-0 rounded-full border ${config.borderColor} opacity-50 ${state === 'monitoring' ? 'animate-ping-slow' : 'animate-ping'}`}></div>
 
-                {/* Outer Rings */}
-                {state === 'monitoring' && (
-                    <div className="absolute inset-0 rounded-full border border-trust-green/20 scale-150 animate-ping-slow"></div>
-                )}
-
+                {/* Rotating Ring for Investigation */}
                 {state === 'investigating' && (
-                    <div className="absolute inset-0 rounded-full border-t-2 border-trust-yellow animate-spin transition-all"></div>
+                    <div className="absolute -inset-2 rounded-full border-t-2 border-trust-yellow/50 animate-spin"></div>
                 )}
+
+                {/* Main Orb */}
+                <div className={`
+                    relative w-14 h-14 rounded-full 
+                    bg-black border-2 ${config.borderColor} 
+                    flex items-center justify-center 
+                    ${config.shadow}
+                    transition-all duration-500
+                    overflow-hidden
+                `}>
+                    {/* Inner Scanning Effect */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                    <div className={`absolute inset-0 ${config.bg}`}></div>
+
+                    {/* Scan Line */}
+                    <div className="absolute inset-x-0 h-[2px] bg-white/50 animate-scan-fast shadow-[0_0_10px_white]"></div>
+
+                    <Icon className={`w-6 h-6 z-10 ${config.color} ${config.animation}`} />
+                </div>
+
+                {/* Status Dot */}
+                <div className={`absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-black ${state === 'monitoring' ? 'bg-trust-green' : state === 'investigating' ? 'bg-trust-yellow' : 'bg-trust-red'}`}></div>
             </div>
         </div>
     );
 };
-
-const GuardianAvatar = ({ state }) => {
-    const baseClasses = "w-12 h-12 rounded-full border-2 bg-guardian-dark flex items-center justify-center transition-all duration-500 overflow-hidden relative";
-
-    // Inner graphic
-    return (
-        <div className={`${baseClasses} ${state === 'investigating' ? 'border-trust-yellow' : state === 'intervening' ? 'border-trust-red' : 'border-trust-green'}`}>
-            <div className={`absolute inset-0 opacity-20 ${state === 'intervening' ? 'bg-trust-red' : 'bg-guardian-blue'}`}></div>
-
-            {/* Simple Shield Icon */}
-            <svg viewBox="0 0 24 24" fill="none" className={`w-6 h-6 z-10 ${state === 'intervening' ? 'text-trust-red' : 'text-trust-green'}`} stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-
-            {/* Scanning line effect */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent h-[200%] w-full animate-scan opacity-30"></div>
-        </div>
-    )
-}
 
 export default GuardianPresence;

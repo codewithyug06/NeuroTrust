@@ -1,12 +1,13 @@
 import { Shield, ArrowRight, Play, AlertTriangle, Users, Lock, CheckCircle, Activity, Smartphone } from 'lucide-react';
+import NeuralBackground from './components/NeuralBackground';
 
 export default function LandingPage({ onLaunchDemo, onLaunchDashboard }) {
     return (
         <div className="min-h-screen w-full bg-guardian-dark text-white font-sans selection:bg-trust-green selection:text-white overflow-x-hidden relative">
 
             {/* Background Ambience */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-guardian-blue/20 via-guardian-dark to-guardian-dark pointer-events-none"></div>
-            <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-guardian-blue/10 via-guardian-dark to-guardian-dark pointer-events-none"></div>
+            <NeuralBackground />
 
             {/* Navigation */}
             <nav className="relative z-50 w-full px-6 py-6 pt-16 flex items-center justify-between container mx-auto">
@@ -32,7 +33,7 @@ export default function LandingPage({ onLaunchDemo, onLaunchDashboard }) {
                     <span className="text-trust-green text-xs font-bold tracking-widest uppercase">Global Trust Network Active</span>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 animate-fade-in-up delay-100 max-w-4xl leading-tight">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 animate-fade-in-up delay-100 max-w-4xl leading-tight glitch-text" data-text="Verify reality">
                     Verify reality<br />
                     <span className="text-white">before it reaches you.</span>
                 </h1>
@@ -42,11 +43,15 @@ export default function LandingPage({ onLaunchDemo, onLaunchDashboard }) {
                     NeuroTrust validates the authenticity of every digital interaction in real-time.
                 </p>
 
-                <div className="flex flex-col md:flex-row gap-4 w-full max-w-md animate-fade-in-up delay-300">
+                <div className="flex flex-col md:flex-row gap-4 w-full max-w-md animate-fade-in-up delay-300 relative">
+                    {/* Scanning Beam Effect */}
+                    <div className="absolute -inset-10 bg-scan-beam mix-blend-overlay opacity-20 pointer-events-none animate-scan-beam mask-linear-fade"></div>
+
                     <button
                         onClick={onLaunchDemo}
-                        className="group flex-1 py-4 px-8 bg-trust-green hover:bg-green-400 text-guardian-dark font-bold rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                        className="group flex-1 py-4 px-8 bg-trust-green hover:bg-green-400 text-guardian-dark font-bold rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.3)] relative overflow-hidden"
                     >
+                        <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-shimmer"></div>
                         <Play className="w-5 h-5 fill-current" />
                         <span>Launch Demo</span>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -6,6 +6,9 @@ import {
 import AgentPassport from './components/AgentPassport';
 import GlobalTrustBar from './components/GlobalTrustBar';
 import IdentityWallet from './components/IdentityWallet';
+import GlassCard from './components/ui/GlassCard';
+import StatusBadge from './components/ui/StatusBadge';
+import CyberButton from './components/ui/CyberButton';
 
 // --- BACKEND API URL ---
 const API_URL = `http://127.0.0.1:8000/api/v1`;
@@ -115,7 +118,7 @@ export default function Dashboard({ onBack }) {
             <div className="flex flex-col">
               <div className="flex items-center gap-3 text-2xl font-bold tracking-tight">
                 <Shield className="w-8 h-8 text-trust-green" />
-                <span className="text-white">NeuroTrust <span className="text-trust-green">COMMAND</span></span>
+                <span className="text-white glitch-text" data-text="NeuroTrust COMMAND">NeuroTrust <span className="text-trust-green">COMMAND</span></span>
               </div>
               <span className="text-[10px] font-mono text-trust-green/60 tracking-[0.3em] uppercase ml-1">Identity Defense Grid</span>
             </div>
@@ -156,30 +159,31 @@ export default function Dashboard({ onBack }) {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
 
           {/* STATS COLUMN */}
-          <div className="space-y-6">
-            <div className="bg-guardian-slate/40 border border-white/5 p-6 rounded-3xl relative overflow-hidden group hover:border-trust-green/30 transition-all">
+          <div className="space-y-6 perspective-1000">
+            <GlassCard className="preserve-3d tilt-card hover:rotate-x-12 hover:rotate-y-12">
               <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity"><Shield className="w-32 h-32" /></div>
               <div className="text-gray-400 text-xs font-mono mb-1 uppercase tracking-wider">Threats Repelled</div>
-              <div className="text-5xl font-bold text-white tracking-tighter">{threatsBlocked.toLocaleString()}</div>
+              <div className="text-5xl font-bold text-white tracking-tighter text-glow-blue">{threatsBlocked.toLocaleString()}</div>
               <div className="flex items-center gap-2 mt-4 text-xs font-bold text-trust-green">
                 <Activity className="w-3 h-3" /> +12.4% Efficiency
               </div>
-            </div>
+            </GlassCard>
 
-            <div className="bg-guardian-slate/40 border border-white/5 p-6 rounded-3xl relative overflow-hidden group hover:border-guardian-blue/30 transition-all">
+            <GlassCard className="hover:border-guardian-blue/30">
               <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity"><Cpu className="w-32 h-32" /></div>
               <div className="text-gray-400 text-xs font-mono mb-1 uppercase tracking-wider">Active Guardians</div>
               <div className="text-5xl font-bold text-white tracking-tighter">{activeNodes}</div>
               <div className="flex items-center gap-2 mt-4 text-xs font-bold text-guardian-blue">
                 <Zap className="w-3 h-3" /> All Systems Online
               </div>
-            </div>
+            </GlassCard>
           </div>
 
           {/* LIVE MAP */}
-          <div className="col-span-1 xl:col-span-3 bg-black/40 border border-white/5 rounded-3xl relative overflow-hidden min-h-[400px] flex items-center justify-center">
+          <GlassCard className="col-span-1 xl:col-span-3 bg-black/40 min-h-[400px] flex items-center justify-center relative shadow-none border-white/5">
             {/* Map Art */}
             <div className="absolute inset-0 opacity-30 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center invert filter contrast-125 saturate-0"></div>
+            <div className="absolute inset-0 bg-scan-beam mix-blend-overlay opacity-10 animate-scan-beam pointer-events-none"></div>
 
             <div className="absolute top-6 left-8 z-10">
               <h3 className="text-xl font-bold flex items-center gap-3 text-white"><Globe className="w-5 h-5 text-guardian-blue animate-pulse" /> LIVE THREAT VECTORS</h3>
@@ -201,14 +205,14 @@ export default function Dashboard({ onBack }) {
                 </div>
               </div>
             ))}
-          </div>
+          </GlassCard>
         </div>
 
         {/* --- ROW 2: CONTROL PANELS --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* MISINFORMATION DEFENSE */}
-          <div className="bg-guardian-slate/40 border border-white/5 p-8 rounded-3xl relative overflow-hidden">
+          <GlassCard className="relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-guardian-blue/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
 
             <div className="flex items-start gap-4 mb-8">
@@ -270,10 +274,10 @@ export default function Dashboard({ onBack }) {
                 </div>
               </div>
             )}
-          </div>
+          </GlassCard>
 
           {/* TRUST REGISTRY */}
-          <div className="bg-guardian-slate/40 border border-white/5 p-8 rounded-3xl flex flex-col h-full">
+          <GlassCard className="flex flex-col h-full">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
                 <div className="p-4 rounded-2xl bg-trust-green/10 border border-trust-green/20 text-trust-green"><Users className="w-8 h-8" /></div>
@@ -306,16 +310,16 @@ export default function Dashboard({ onBack }) {
                     <span className="text-xs font-bold text-trust-green">{agent.trust}% TRUST</span>
                     <div className="flex items-center gap-2">
                       <span className="text-[8px] text-gray-500">BY: {agent.category === 'Finance' ? 'CHASE BANK' : 'MICROSOFT'}</span>
-                      <div className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-gray-400 uppercase">{agent.category}</div>
+                      <StatusBadge status="neutral">{agent.category}</StatusBadge>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
+          </GlassCard>
         </div>
-      </main>
-    </div>
+
+      </main >
+    </div >
   );
 }
