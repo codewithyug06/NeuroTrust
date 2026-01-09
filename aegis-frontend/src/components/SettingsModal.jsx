@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
-import { X, Lock, Eye, Shield, Database, FileText, Download } from 'lucide-react';
+import { X, Lock, Eye, Shield, Database, FileText, Download, CheckCircle } from 'lucide-react';
 
 export default function SettingsModal({ onClose, activeTab = 'privacy' }) {
     const [tab, setTab] = useState(activeTab);
+    const [telemetryEnabled, setTelemetryEnabled] = useState(true);
+
+    const handleExport = () => {
+        const element = document.createElement("a");
+        const file = new Blob([JSON.stringify({ user: "did:ion:123", trust: 98, logs: [] }, null, 2)], { type: 'application/json' });
+        element.href = URL.createObjectURL(file);
+        element.download = "aegis_trust_data.json";
+        document.body.appendChild(element);
+        element.click();
+    };
+
+    const handlePurge = () => {
+        if (confirm("Are you sure? This will reset your Trust Score context.")) {
+            alert("Local Data Purged Successfully.");
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in" onClick={onClose}>
@@ -50,12 +66,14 @@ export default function SettingsModal({ onClose, activeTab = 'privacy' }) {
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                            <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700 transition-colors hover:bg-gray-800 cursor-pointer" onClick={() => setTelemetryEnabled(!telemetryEnabled)}>
                                 <div>
                                     <div className="text-white font-bold">Anonymized Telemetry</div>
                                     <div className="text-xs text-gray-500">Contribute to the Global Immune System without sharing PII.</div>
                                 </div>
-                                <div className="w-12 h-6 bg-blue-600 rounded-full relative cursor-pointer"><div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div></div>
+                                <div className={`w-12 h-6 rounded-full relative transition-colors ${telemetryEnabled ? 'bg-blue-600' : 'bg-gray-700'}`}>
+                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${telemetryEnabled ? 'right-1' : 'left-1'}`}></div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -72,10 +90,10 @@ export default function SettingsModal({ onClose, activeTab = 'privacy' }) {
                                 </div>
                             </div>
 
-                            <button className="w-full py-3 border border-gray-700 hover:bg-gray-800 text-gray-300 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                            <button onClick={handleExport} className="w-full py-3 border border-gray-700 hover:bg-gray-800 text-gray-300 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95">
                                 <Download className="w-4 h-4" /> Export My Trust Data (JSON)
                             </button>
-                            <button className="w-full py-3 border border-red-900/30 hover:bg-red-900/20 text-red-400 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                            <button onClick={handlePurge} className="w-full py-3 border border-red-900/30 hover:bg-red-900/20 text-red-400 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95">
                                 <X className="w-4 h-4" /> Purge All Local Data
                             </button>
                         </div>

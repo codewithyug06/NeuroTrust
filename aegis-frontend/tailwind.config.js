@@ -7,14 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        cyber: {
-          black: '#020617',
-          dark: '#0f172a',
-          blue: '#3b82f6',
-          purple: '#8b5cf6',
-          green: '#10b981',
-          red: '#ef4444',
-          yellow: '#eab308',
+        trust: {
+          green: '#10B981', // Verified
+          yellow: '#F59E0B', // Uncertain
+          red: '#EF4444', // High Risk
+          DEFAULT: '#10B981'
+        },
+        guardian: {
+          blue: '#3B82F6', // Neutral/Guardian
+          dark: '#0f172a', // Background
+          slate: '#1E293B', // Panels
         }
       },
       fontFamily: {

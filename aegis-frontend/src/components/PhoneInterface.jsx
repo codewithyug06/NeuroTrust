@@ -43,7 +43,7 @@ export default function PhoneInterface({
                         </div>
 
                         {/* SCREEN CONTENT */}
-                        <div className="relative w-full h-full bg-black overflow-hidden font-sans text-white">
+                        <div className={`relative w-full h-full bg-black overflow-hidden font-sans text-white ${statusBar?.elderlyMode ? 'text-lg' : ''}`}>
                             {children}
                         </div>
 

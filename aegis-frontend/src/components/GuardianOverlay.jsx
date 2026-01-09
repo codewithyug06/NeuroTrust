@@ -158,21 +158,30 @@ export default function GuardianOverlay({
                 <div className={`absolute bottom-4 left-2 right-2 flex flex-col gap-2 transition-all duration-500 ${showGuardian ? 'z-20 opacity-20 scale-95 blur-sm' : 'z-40'}`}>
 
                     {/* FORENSIC HUD (Technical Depth) */}
-                    <div className="grid grid-cols-3 gap-1 mb-1">
+                    {/* FORENSIC HUD (Technical Depth) */}
+                    <div className="grid grid-cols-4 gap-1 mb-1">
                         <div className="bg-black/80 backdrop-blur p-2 rounded border border-gray-800 flex flex-col items-center">
-                            <span className="text-[8px] text-gray-400 uppercase">BLINK RATE</span>
-                            <span className={`text-xs font-bold ${biometrics?.blink_rate < 10 ? 'text-red-500' : 'text-green-500'}`}>
+                            <span className="text-[6px] text-gray-400 uppercase tracking-wider">BLINK RATE</span>
+                            <span className={`text-[10px] font-bold ${biometrics?.blink_rate < 10 ? 'text-red-500' : 'text-green-500'}`}>
                                 {biometrics?.blink_rate || "--"}/min
                             </span>
                         </div>
                         <div className="bg-black/80 backdrop-blur p-2 rounded border border-gray-800 flex flex-col items-center">
-                            <span className="text-[8px] text-gray-400 uppercase">HEAD YAW</span>
-                            <span className="text-xs font-bold text-blue-400">{biometrics?.head_yaw || "0"}°</span>
+                            <span className="text-[6px] text-gray-400 uppercase tracking-wider">LIP SYNC</span>
+                            <span className={`text-[10px] font-bold ${isSafeMode ? 'text-green-500' : 'text-red-500'}`}>
+                                {isSafeMode ? "OK" : ">120ms"}
+                            </span>
                         </div>
                         <div className="bg-black/80 backdrop-blur p-2 rounded border border-gray-800 flex flex-col items-center">
-                            <span className="text-[8px] text-gray-400 uppercase">JITTER</span>
-                            <span className={`text-xs font-bold ${moodScore < 40 ? 'text-red-500' : 'text-green-500'}`}>
-                                0.{(100 - moodScore).toString().slice(0, 2)}%
+                            <span className="text-[6px] text-gray-400 uppercase tracking-wider">EMOTION</span>
+                            <span className={`text-[10px] font-bold ${moodScore > 80 ? 'text-green-500' : 'text-red-500'}`}>
+                                {moodScore > 80 ? "MATCH" : "DIFF"}
+                            </span>
+                        </div>
+                        <div className="bg-black/80 backdrop-blur p-2 rounded border border-gray-800 flex flex-col items-center cursor-pointer hover:bg-blue-900/40 transition-colors group">
+                            <span className="text-[6px] text-blue-400 uppercase tracking-wider group-hover:text-white">ACTION</span>
+                            <span className="text-[10px] font-bold text-white flex items-center gap-1">
+                                <Brain className="w-3 h-3" /> TEST
                             </span>
                         </div>
                     </div>

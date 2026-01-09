@@ -29,7 +29,9 @@ class MockAIService:
                     "liveness": "PASSED",
                     "voice_match": "MATCH_CONFIRMED",
                     "blink_rate": random.randint(12, 18),
-                    "head_yaw": random.randint(-5, 5)
+                    "head_yaw": random.randint(-5, 5),
+                    "lip_sync_status": "SYNCED_OK",    # Feature
+                    "emotion_match": "MATCH_99%"       # Feature
                 },
                 "mood_score": random.randint(95, 99),
                 "voice_jitter": random.uniform(0.01, 0.03),
@@ -41,6 +43,7 @@ class MockAIService:
                 "logs": [
                     f"[{current_time}] Azure Vision: Liveness Confirmed (99.8%)",
                     f"[{current_time}] Voice ID: Match (Sample 44kHz)",
+                    f"[{current_time}] Lip Sync: <10ms delay (Natural)", 
                     f"[{current_time}] Entra: Verified Credential Present"
                 ]
             }
@@ -60,7 +63,9 @@ class MockAIService:
                     "liveness": "FAILED",
                     "voice_match": "NO_MATCH",
                     "blink_rate": vals["blink"],
-                    "head_yaw": 0 
+                    "head_yaw": 0,
+                    "lip_sync_status": "DELAY_150MS",  # Feature: Anomaly
+                    "emotion_match": "MISMATCH"        # Feature: Anomaly 
                 },
                 "mood_score": vals["mood"],
                 "voice_jitter": vals["jitter"],
