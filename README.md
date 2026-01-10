@@ -86,7 +86,7 @@ NeuroTrust is built on the principle that digital safety should be accessible to
 
 ## 👥 Team Hawkin's Hero
 *  **Team Lead:** [Yugendhar S](https://github.com/codewithyug06)
-*  **Team Lead:** [Madhumitha S](https://github.com/Madhumitxx13)
+*  **Lead Architect:** [Madhumitha S](https://github.com/Madhumitxx13)
 
 ---
 
