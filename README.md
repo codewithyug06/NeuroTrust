@@ -38,7 +38,6 @@ NeuroTrust implements a multilayered approach to verify digital authenticity:
 ---
 
 ## 🏗️ Technical Architecture
-![System Architecture](https://via.placeholder.com/800x400?text=NeuroTrust+Architecture+Diagram)
 
 NeuroTrust is built on a "Layers of Truth" strategy powered by the **Microsoft Cloud Stack**:
 
